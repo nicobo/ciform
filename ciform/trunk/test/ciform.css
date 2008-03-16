@@ -1,0 +1,5 @@
+/* A very simple style for demo purpose */
+body { background:white; }
+code, pre { background:#DDEEEE; }
+.txt { background:#CCFF99;}
+.b64, .bin, .hex { background:#EEEEAA; }
