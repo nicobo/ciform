@@ -5,7 +5,7 @@
 	define("CIFORM_RSA_KEYSIZE",768);
 	define("CIFORM_RSA_KEYSTORE","keys");
 	define("CIFORM_RSA_KEYFILE_PEM",CIFORM_RSA_KEYSTORE."/protected/key-rsa.pem");
-	define("CIFORM_RSA_KEYFILE_JS",CIFORM_RSA_KEYSTORE."/key-rsa.pub.js");
+	define("CIFORM_RSA_KEYFILE_JS",CIFORM_RSA_KEYSTORE."/key-rsa.pub.json");
 	define("CIFORM_RSA_REQUEST_GENKEY","ciform-genkey");
 
 
@@ -48,20 +48,13 @@
 		$pq = ciform_rsa_bigInt2Json($math,$pubKey->getModulus());
 		//$mpi = base64_encode($math->bin2int($pubKey->getModulus())+$math->bin2int($pubKey->getExponent()));
 		$json = "{"
-			."'type':'".CIFORM_RSA_KEYTYPE."'"
-			.","
-			."'size':".$pubKey->getKeyLength()	// size of the key, in bits
-			.","
-			."'p':$p"				// prime factor p, as an array of 28 bits integers
-			.","
-			."'q':$q"				// prime factor q, as an array of 28 bits integers
-			.","
-			."'e':$e"				// public exponent as an array of 28 bits integers
-			.","
-			."'pq':$pq"				// modulus, as an array of 28 bits integers ; not required (=p*q)
-			//.","
-			//."'mpi':'$mpi'"				// e + modulus, encoded into a base64 MPI string
-			."}";
+			."'type':'".CIFORM_RSA_KEYTYPE."',"
+			."'size':".$pubKey->getKeyLength().","	// size of the key, in bits
+			."'p':$p,"				// prime factor p, as an array of 28 bits integers
+			."'q':$q,"				// prime factor q, as an array of 28 bits integers
+			."'e':$e,"				// public exponent as an array of 28 bits integers
+			."'pq':$pq}";				// modulus, as an array of 28 bits integers
+			//."'mpi':'$mpi'"			// e + modulus, encoded into a base64 MPI string
 		return $json;
 	}
 
@@ -97,10 +90,10 @@
 			{
 				@mkdir(dirname($jsFilename),0777,TRUE);
 				// FIXME : serverURL must be absolute, so scripts can call it from other servers
-				$serverURL = $_SERVER['PHP_SELF'];
+				//$serverURL = $_SERVER['PHP_SELF'];
 				$pubKey = ciform_rsa_pubKey2Json($keyPair);
-				$jsContents .= "\nvar CIFORM = {'serverURL':'".str_replace("'","\\'",$serverURL)."', 'pubKey':$pubKey};";
-				@file_put_contents($jsFilename,$jsContents);
+				//$jsContents = "\nvar CIFORM = {'serverURL':'".str_replace("'","\\'",$serverURL)."', 'pubKey':$pubKey};";
+				@file_put_contents($jsFilename,$pubKey);
 			}
 
 			// returns the newly created key
@@ -116,6 +109,24 @@
 		$keyPair = ciform_rsa_genKeyPair(CIFORM_RSA_KEYSIZE, CIFORM_RSA_KEYFILE_PEM, CIFORM_RSA_KEYFILE_JS);
 		if ( CIFORM_DEBUG ) print_r($keyPair);
 		return $keyPair;
+	}
+
+
+
+	function ciform_rsa_getProtocol()
+	{
+		if ( CIFORM_DEBUG ) echo "ciform_rsa_getProtocol() = ";
+		// FIXME : serverURL must be absolute, so scripts can call it from other servers
+		$serverURL = $_SERVER['PHP_SELF'];
+		$keyPair = ciform_rsa_getKeyPair();
+		$protocol = "{
+			'VERSION':".CIFORM_PROTOCOL_VERSION.",
+			'PACKET_PREFIX':'".CIFORM_REQUEST_PREFIX."',
+			'serverURL':'".str_replace("'","\\'",$serverURL)."',
+			'pubKey':".ciform_rsa_pubKey2Json($keyPair)
+			."}";
+		if ( CIFORM_DEBUG ) print_r($protocol);
+		return $protocol;
 	}
 
 

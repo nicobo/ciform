@@ -1,13 +1,15 @@
 <?php
 	// constants exportable to included scripts
 	define("CIFORM_SESSION","CIFORM");
+	define("CIFORM_PROTOCOL_VERSION",0);
+	define("CIFORM_REQUEST_PREFIX","ciform:");
 	define("CIFORM_SESSION_KEYPAIR","KEYPAIR");	// TODO : move to ciform_rsa.php
 	if ( ! defined("CIFORM_DEBUG") ) define("CIFORM_DEBUG",FALSE);
 
 	require_once("ciform_rsa.php");
 
 	// private constants
-	define("CIFORM_REQUEST_PREFIX","ciform:");
+	define("CIFORM_REQUEST_PROTOCOL","protocol");
 	define("CIFORM_KEYTYPE",CIFORM_RSA_KEYTYPE);	// choose the desired encryption module here
 	if ( ! defined("CIFORM_AUTODECRYPT") ) define("CIFORM_AUTODECRYPT", TRUE );
 
@@ -103,6 +105,28 @@
 
 		return $decoded;
 	}
+
+
+
+	// returns the protocol of this script
+	if ( isset($_REQUEST[CIFORM_REQUEST_PROTOCOL]) )
+	{
+		$func = "ciform_".CIFORM_KEYTYPE."_getProtocol";
+		$name = $_REQUEST[CIFORM_REQUEST_PROTOCOL];
+		header("Content-type: text/plain");
+		// if a name was given, use it to name the variable :
+		// the result may be used as a full (java)script
+		if ( trim($name) != "" ) {
+			echo "var $name = " . $func() . ";";
+		}
+		// if no name was given, just print the JSON value :
+		// the result may be used as an Ajax response
+		else {
+			echo $func();
+		}
+		exit;
+	}
+
 
 
 	// makes sure the key is accessible
