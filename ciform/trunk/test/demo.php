@@ -1,4 +1,11 @@
 <?php
+	// shows source of this file
+	if ( isset($_REQUEST['source']) )
+	{
+		show_source(__FILE__);
+		exit;
+	}
+
 	set_include_path("/opt/PEAR/".PATH_SEPARATOR.get_include_path());
 	set_include_path(get_include_path().PATH_SEPARATOR."../src/");
 	define("CIFORM_AUTODECRYPT",FALSE); // for demo purpose only
@@ -6,10 +13,21 @@
 ?><html>
 	<head>
 		<link rel="stylesheet" href="ciform.css" media="screen">
-		<script type="text/javascript" src="../target/libciform.js"></script>
+		<script type="text/javascript" src="../target/lib/libciform.js"></script>
+		<script type="text/javascript" src="../src/minilib.js"></script><!-- for debug only -->
 		<script type="text/javascript" src="../src/ciform.js"></script><!-- for debug only -->
-		<script type="text/javascript" src="keys/key-rsa.pub.js"></script>
+		<!--script type="text/javascript" src="keys/key-rsa.pub.js"></script-->
+		<script type="text/javascript" src="<?= $_SERVER['PHP_SELF'] ?>?protocol=server1"></script>
 		<script type="text/javascript">
+
+			/*function previewCipherEnd()
+			{
+				var encoder = new ciform.encoders.RSAEncoder(CIFORM['pubKey'],{'preamble':true,'salt':true});
+				document.getElementById('ciphertext').innerHTML = encoder.encode('in');
+				//document.getElementById('logo').src = "../pix/ciform-24.png";
+				//document.getElementById('logo').style.background = "none";
+				document.getElementById('logo').style.border = "none";
+			}*/
 
 			/**
 				This function is only for demo purpose.
@@ -18,8 +36,17 @@
 			function previewCipher()
 			{
 				// the following encoder is approaching the one used by Ciform
-				var encoder = new ciform.RSAEncoder(CIFORM['pubKey'],{'preamble':true,'salt':true});
+				//document.getElementById('logo').src = "../pix/shake.gif";
+				document.getElementById('logo').style.backgroundColor = "#FF9200";
+				//document.getElementById('logo').style.border = "solid #FF9200 2px";
+				//setTimeout("previewCipherEnd()",100);	// a small delay to give time to the above image to de displayed
+				//previewCipherEnd();
+				setTimeout( function(){var encoder = new ciform.encoders.RSAEncoder(CIFORM['pubKey'],{'preamble':true,'salt':true});
 				document.getElementById('ciphertext').innerHTML = encoder.encode('in');
+				//document.getElementById('logo').src = "../pix/ciform-24.png";
+				document.getElementById('logo').style.background = "none";
+				//document.getElementById('logo').style.border = "none";
+				}, 10 );
 			}
 
 			/**
@@ -34,8 +61,11 @@
 		</script>
 	</head>
 	<body>
+		<a href="<?= $_SERVER['PHP_SELF']."?source" ?>">show source</a>
 
 		<h1>Demo page for CiForm</h1>
+
+		<p>This page is for web administrators who wish to see Ciform working.</p>
 
 		<h2>1. Fill in the following form</h2>
 
@@ -47,7 +77,7 @@
 			login : <input type="text" name="user"><br>
 			password : <input type="password" class="txt" name="password" onkeyup="this.onchange()" onchange="javascript:previewCipher();">
 				<!-- TODO icon onclick : show the public key and the server url -->
-				<img id="logo" src="pix/green-lock.gif" style="vertical-align:middle;">
+				<img id="logo" src="../pix/ciform-24.png" style="vertical-align:middle;">
 				Encrypt using SHA-1 : <input type="checkbox" name="usesha1" onchange="javascript:checkSha1(this);">
 				<br>
 				Preview of the encrypted text * : <span id="ciphertext" class="hex"></span>

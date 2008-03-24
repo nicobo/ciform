@@ -1,21 +1,32 @@
 <?php
+	// shows source of this file
+	if ( isset($_REQUEST['source']) )
+	{
+		show_source(__FILE__);
+		exit;
+	}
+
 	set_time_limit(60);	// for tests with long-sized keys
 	set_include_path("/opt/PEAR/".PATH_SEPARATOR.get_include_path());
 	set_include_path(get_include_path().PATH_SEPARATOR."../src/");
 	define("CIFORM_AUTODECRYPT",FALSE);
-	define("CIFORM_DEBUG",TRUE);
 	require_once("ciform.php");
 ?><html>
 	<head>
 		<link rel="stylesheet" href="ciform.css" media="screen">
-		<script type="text/javascript" src="../target/libciform.js"></script>
+		<script type="text/javascript" src="../target/lib/libciform.js"></script>
+		<script type="text/javascript" src="../src/minilib.js"></script>
 		<script type="text/javascript" src="../src/ciform.js"></script>
-		<script type="text/javascript" src="keys/key-rsa.pub.js"></script>
+		<!--script type="text/javascript" src="keys/key-rsa.pub.js"></script-->
+		<script type="text/javascript" src="<?= $_SERVER['PHP_SELF'] ?>?protocol=myCiformServer"></script>
 	</head>
 
 	<body>
+		<a href="<?= $_SERVER['PHP_SELF']."?source" ?>">show source</a>
 
 		<h1>Test page for Ciform</h1>
+
+		<p>This page is for developers to test public features of Ciform.</p>
 
 		<h2>1. Key generation</h2>
 
@@ -27,7 +38,7 @@
 
 		<p>The key is either read from a file or generated on the fly if no file was found.<br>
 		It is served to the client as JSON data :</p>
-		<code><?= "var CIFORM_PUBKEY =" . ciform_rsa_pubKey2Json($keyPair) . ";" ?></code>
+		<code><?= "var myCiformServer =" . ciform_rsa_pubKey2Json($keyPair) . ";" ?></code>
 
 
 
@@ -100,6 +111,7 @@
 		<p><table style="border:solid black 1px; border-collapse:collapse;" width="480px">
 		<tr><th>KEY</th><th>VALUE</th><th>DECRYPTED</th></tr>
 		<?php
+			define("CIFORM_DEBUG",TRUE);
 			foreach( $_REQUEST as $key => $val )
 			{
 				$dec = ciform_decryptParam($val,$keyPair);
@@ -120,6 +132,7 @@
 					echo "</tr>";
 				}
 			}
+			define("CIFORM_DEBUG",FALSE);
 		?></table></p>
 
 	<br><br><br>
@@ -131,15 +144,26 @@
 	//<!--
 		function test_encrypt()
 		{
-			var cif = new ciform.Ciform(document.getElementById('myForm'),CIFORM['pubKey']);
 			var start = new Date();
-			var ciphertext = cif.encryptFields([{'in':"in",'out':"out"}],alert);
+
+			// option 1 : in one operation : usefull to put in form.onsubmit
+			//ciform.encrypt( 'myForm', myCiformServer, {'onerror':alert,'fields':[{'in':"in",'out':"out"}]} );
+
+			// option 2 : instanciates one Ciform per server then encrypt any target
+			//var cif = new ciform.Ciform( myCiformServer, {'onerror':alert} );
+			//cif.encryptForm( "myForm", {'tags':"password"} );
+			//$('myAnchor').href = cif.encryptURL( $('myAnchor').href, {'fields':"pwd"} );
+
+			// option 3 : attach a Ciform to an element of the page then trigger the encryption
+			var cif = new ciform.Ciform( "myForm", myCiformServer, {'onerror':alert,'fields':[{'in':"in",'out':"out"}]} );
+			cif.encrypt();
+
 			var end = new Date();
 			//document.getElementById('out').value = ciphertext;
 			document.getElementById('howlong').innerHTML = (end.getTime() - start.getTime()) / 1000 + " s";
 		}
 
-		var mpi = s2r(b2mpi(CIFORM['pubKey']['pq'])+b2mpi([CIFORM['pubKey']['e']])).replace(/\n/,'');
+		var mpi = s2r(b2mpi(myCiformServer['pubKey']['pq'])+b2mpi([myCiformServer['pubKey']['e']])).replace(/\n/,'');
 		document.getElementById('mpi').value = mpi;
 
 		var s = r2s(mpi);
