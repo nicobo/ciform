@@ -9,6 +9,10 @@
 
 
 
+/**
+	@return true is the argument is not undefined nor null
+	@type boolean
+*/
 function $defined( name )
 {
 	return name != null && name != undefined;
@@ -21,6 +25,7 @@ function $defined( name )
 
 	@param fieldName the name of the field to find, or the field itself
 	@return The DOM node corresponding to the parameters or undefined if not found
+	@type Element
 */
 function $( fieldName )
 {
@@ -31,6 +36,9 @@ function $( fieldName )
 
 /**
 	Copies all fields from the given arguments into this object.
+
+	@return this
+	@type Object
 	@addon
 */
 Object.prototype.extend = function()
@@ -53,6 +61,9 @@ Object.prototype.extend = function()
 /**
 	Creates a new object with the properties of several objects merged together.<br>
 	The properties of the latest argument overrides the ones of the previous arguments.
+
+	@return a new object with the properties of all given arguments
+	@type Object
 */
 function merge()
 {
@@ -68,6 +79,7 @@ function merge()
 
 	@param noCase	If both objects are Strings, do a case insensitive comparison
 	@return true if the objects are equals, else false
+	@type boolean
 */
 function equals( o1, o2, noCase )
 {
@@ -78,6 +90,7 @@ function equals( o1, o2, noCase )
 
 /**
 	@see #equals
+	@type boolean
 */
 function equalsNoCase( o1, o2 )
 {
@@ -90,6 +103,7 @@ function equalsNoCase( o1, o2 )
 	@param noCase If the value is a String, use a case insensitive test to search this object
 	@return true if this array contains the given value (not key)
 	@addon
+	@type boolean
 */
 Array.prototype.contains = function( value, noCase )
 {
@@ -110,6 +124,7 @@ Array.prototype.contains = function( value, noCase )
 	@see Array#contains
 	@see #equalsNoCase
 	@addon
+	@type boolean
 */
 Array.prototype.containsNoCase = function( value )
 {
