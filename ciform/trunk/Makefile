@@ -41,7 +41,7 @@ clean:
 .PHONY: doc
 doc:
 	-mkdir -p $(TARGET_API)
-	$(JSDOC) -d $(TARGET_API)/js --no-lexical-privates -r src --package-naming --nested-file-naming --logo pix/ciform-blue.png --project-name Ciform
+	$(JSDOC) -d $(TARGET_API)/js --no-lexical-privates --package-naming --nested-file-naming --logo pix/ciform-flat-48x48.png --project-name Ciform src/*.js
 	#./phpdoc.sh
 	#doxygen ./Doxyfile
 
