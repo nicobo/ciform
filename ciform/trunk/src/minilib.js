@@ -10,7 +10,7 @@
 
 
 /**
-	@return true is the argument is not undefined nor null
+	@return true if the argument is not undefined nor null
 	@type boolean
 */
 function $defined( name )
@@ -21,7 +21,9 @@ function $defined( name )
 
 
 /**
-	Light implementation of the $ function of modern libraries : tries to find a DOM node from a versatile key.
+	Light implementation of the $ function of modern libraries : tries to find a DOM node from a versatile key.<br>
+
+	<p>NOTE : Not quite compatible with jQuery (because it requires something like '#myid').</p>
 
 	@param fieldName the name of the field to find, or the field itself
 	@return The DOM node corresponding to the parameters or undefined if not found
