@@ -147,15 +147,15 @@
 			var start = new Date();
 
 			// option 1 : in one operation : usefull to put in form.onsubmit
-			//ciform.encrypt( 'myForm', myCiformServer, {'onerror':alert,'fields':[{'in':"in",'out':"out"}]} );
+			Ciform.encrypt( 'myForm', myCiformServer, {'onerror':alert,'fields':[{'in':"in",'out':"out"}]} );
 
 			// option 2 : instanciates one Ciform per server then encrypt any target
-			//var cif = new ciform.Ciform( myCiformServer, {'onerror':alert} );
-			//cif.encryptForm( "myForm", {'tags':"password"} );
-			//$('myAnchor').href = cif.encryptURL( $('myAnchor').href, {'fields':"pwd"} );
+			var cif = new Ciform.Ciform( myCiformServer, {'onerror':alert} );
+			cif.encryptForm( "myForm", {'tags':"password"} );
+			$('myAnchor').href = cif.encryptURL( $('myAnchor').href, {'fields':"pwd"} );
 
 			// option 3 : attach a Ciform to an element of the page then trigger the encryption
-			var cif = new ciform.Ciform( "myForm", myCiformServer, {'onerror':alert,'fields':[{'in':"in",'out':"out"}]} );
+			var cif = new Ciform.Ciform( "myForm", myCiformServer, {'onerror':alert,'fields':[{'in':"in",'out':"out"}]} );
 			cif.encrypt();
 
 			var end = new Date();
