@@ -1,10 +1,18 @@
 <html>
 	<head>
 		<title>Test Page for Ciform</title>
+
+		<!-- JsUnit requirement -->
 		<script language="javascript" src="/opt/jsunit/app/jsUnitCore.js"></script>
-		<script language="javascript" src="../target/libciform.js"></script>
+
+		<!-- standard Ciform library -->
+		<script language="javascript" src="../target/lib/libciform.js"></script>
+
+		<!-- development Ciform libraries (override some part of the one on the previous line) -->
 		<script language="javascript" src="../src/minilib.js"></script>
 		<script language="javascript" src="../src/ciform.js"></script>
+
+		<!-- Unit tests -->
 		<script language="javascript">
 
 			function testSHA1Encoder()
@@ -18,7 +26,7 @@
 			function testRSAEncoder()
 			{
 				var pubKey = { 'type':"rsa", 'e':[17], 'pq':[142235881,93780825,214584072,42027371,203833933,128905630,39039844,39477483,226960049,15] };
-				var enc = new Ciform.encoders.RSAEncoder(pubKey,{'preamble':false,'salt':false});
+				var enc = new Ciform.encoders.RSAEncoder({'pubKey':pubKey,'preamble':false,'salt':false});
 				assertEquals("No salt, no preamble","3c6888c1575418fce66b9ab0a936afd394f702fb1388b04625ab20334c40bbe1",enc.encode("test").toLowerCase());
 			}
 

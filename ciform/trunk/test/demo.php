@@ -58,6 +58,11 @@
 				document.forms[0].output.className = checkbox.checked ? "hex ciform-sha1" : "hex";
 			}
 
+			function doSubmit( form )
+			{
+				var cipher = new Ciform.Cipher({'pubKey':CIFORM['pubKey'],'onStartEncryption':alert});
+				return cipher.encryptField( {'input':$('password'),'output':$('output')} );
+			}
 		</script>
 	</head>
 	<body>
@@ -72,7 +77,7 @@
 		<p>On submit, a hidden output field takes the value of the encrypted password,
 		and the password field is emptied so it is not transmitted.</p>
 
-		<form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST" onsubmit="javascript:return new ciform.Ciform(this,CIFORM['pubKey']).encryptFields([{'in':'password','out':'output'}],alert);">
+		<form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST" onsubmit="javascript:doSubmit();">
 			<input type="hidden" class="hex" name="output" size="80" onchange="javascript:document.getElementById('ciphertext').innerHTML=this.value;">
 			login : <input type="text" name="user"><br>
 			password : <input type="password" class="txt" name="password" onkeyup="this.onchange()" onchange="javascript:previewCipher();">
