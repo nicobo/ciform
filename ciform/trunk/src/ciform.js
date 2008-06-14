@@ -8,67 +8,54 @@
 	</p>
 
 	<p>It has 2 layers :<ol>
-		<li>the {@link Ciform.encoders 'encoders' layer} contains wrapper classes
-			for each supported encryption method : it's a way to normalize encryption
-			and to provide the upper layer an homogenous API. This is the layer that
-			really deals with the cryptographic functions.<br>
-			One can directly use classes from this layer to encode a message without requiring to know the internals of the cipher.
-		<li>the top, 'user' layer contains classes dedicated to handle encryption of a form in a way the server will be able to decrypt it.<br>
-			The main entry points are :<ul>
-			<li>the {@link Ciform.Cipher} class :<br>
-				It has methods to easily encrypt different kind of objects like input fields, URL, ...
-				It follows the <em>ciform encoding scheme</em> so that a server equiped with the Ciform library will be able to decrypt the data.
-			<li>the {@link $ciform} function :<br>
-				It is a shortcut to make the creation of Ciform.Cipher objects less verbose.
-				It returns a {@link Ciform.Cipher} object that can be used as usual.
-			</ul>
+		<li>the {@link Ciform.encoders 'encoders' namespace} contains the encoders used by Ciform.
+		 	This is the layer that really deals with the cryptographic functions.<br>
+		<li>the {@link Ciform top, 'user' layer} contains classes dedicated to encryption of the data
+			being exchanged between the client and the server.<br>
 		</ol>
 	</p>
 
-	<b>Example 1 : encrypting password fields</b>
-	<code><pre>
-// this way you define a simple encryption on all password fields that will take place when the form is submitted
-new Ciform.Cipher({
-	'target':new Ciform.Field({
-		'form':document.forms[0],
-		'allowTypes':"password"	// this can be either a tag name or its type in case of an INPUT tag. All INPUT tags are allowed by default.
-		}),
-	'encoder':
-	'pubKey':pubkey				// the default encoder is RSA so the public key has to be given (which here is defined elsewhere). See {@link Ciform.encoders.RSAPublicKey}.
-	});
+	<h5><b>Example 1 : encrypting password fields</b></h5>
 
-// the same operation using the $ciform function :
-$ciform({'pubKey':pubkey,'form':document.forms[0],'allowTypes':"password"});
-	</pre></code>
-
-	<b>Example 2 : encrypting on demand</b>
+	<p>This way you define a simple encryption on all password fields of a form, that will take place when it is submitted.</p>
 	<code><pre>
-// this way you could encrypt fields exactly when you want (same apply with the Ciform.Cipher constructor)
-var ciform = $ciform({'fields':[document.getElementById('myInputField')],'pubKey':pubkey});
+&lt;HEAD&gt;
 ...
-// the encryption could be triggered whenever you want ; the following line is only an example
-document.forms[0].onsubmit = ciform.encrypt();
+&lt;SCRIPT type="text/javascript"&gt;
+	// pubKey is defined elsewhere : it is the public key used by the default RSA encoder
+	var mycipher = new {@link Ciform.Cipher Ciform.Cipher}({'pubKey':pubkey});
+&lt;/SCRIPT&gt;
+...
+&lt;/HEAD&gt;
+...
+&lt;FORM action="http://myserver/mypage.php" onsubmit="javascript:mycipher.{@link Ciform.Cipher#encryptForm encryptForm}(this,{'allowTypes':"password"});"&gt;
+...
 	</pre></code>
 
-	<b>Example 3 : different types of encryption within the same page</b>
+	<h5><b>Example 2 : different types of encryption within the same page</b></h5>
+
+	<p>You can use several {@link Ciform.Cipher Ciform.Cipher} objects at the same time.</p>
 	<code><pre>
-// you can use several Ciform.Cipher objects
-var form1 = $ciform({'form':document.forms[0],'allowTypes':"password",'pubKey':pubkey1});
+var toServer1 = new {@link Ciform.Cipher Ciform.Cipher}({'pubKey':pubkey1});
 // in the following line the server is not the same one, so the public key is different
-var form2 = $ciform({'form':document.forms[1],'pubKey':pubKey2});
+var toServer2 = new {@link Ciform.Cipher Ciform.Cipher}({'pubKey':pubKey2});
+...
+toServer1.encryptForm(document.forms[1]);
+...
+toServer2.encryptField($('country'));
 	</pre></code>
 	</p>
 
-	<b>Example 4 : using the same object to encrypt different fields</b>
+	<h5><b>Example 3 : using the same object to encrypt different fields</b></h5>
+
 	<code><pre>
-// just define a Ciform.Cipher with no target ; the given parameters will be used for the next operations
-var ciform = $ciform({'pubKey':pubkey});
+var ciform = new {@link Ciform.Cipher Ciform.Cipher}({'pubKey':pubkey});
 ...
 // encrypts an input field : the encrypted value will replace its current value
-ciform.encryptField(document.getElementById('myFieldId'));
+ciform.{@link Ciform.Cipher#encryptField encryptField}(document.getElementById('myFieldId'));
 ...
 // encrypts the parameters in a URL (and replaces the original value)
-document.getElementById('anAnchor').href = ciform.encryptURL(document.getElementById('anAnchor').href);
+document.getElementById('anAnchor').href = ciform.{@link Ciform.Cipher#encryptURL encryptURL}(document.getElementById('anAnchor').href);
 	</pre></code>
 
 	@requires http://www.hanewin.net/encrypt/rsa/base64.js
@@ -90,26 +77,25 @@ document.getElementById('anAnchor').href = ciform.encryptURL(document.getElement
 
 /**
 	@class Defines a namespace for this project.
-	<p>NOTE : The first letter is in upper case mainly to prevent errors like using 'ciform' to name a variable,
-	and because it could also be considered an Object containing the definitions of this library.<br>
-	It is not very clean since other namespaces are named with lower case characters, but there's currently no perfect solution in Javascript.</p>
-	@constructor
+		<p>NOTE : The first letter is in upper case mainly to prevent errors like using 'ciform' to name a variable,
+		and because it should also be considered as an Object containing the definitions of this library.<br>
+		It is not very clean since other namespaces are named with lower case characters, but there's currently no perfect solution in Javascript.</p>
 */
-Ciform = function(){};
+Ciform = function(){};	// FIXME : this is a fix for this namespace to appear in doc
+Ciform = {};
 
 
 
 /**
 	@class This namespace contains the constants required for the client to communicate with the server.<br>
 
-	<p>Data from the server is served as a literal object indexed with some of those constants.<br>
-	e.g. <code>{ 'serverURL':"login.php", 'pubKey':{'type':'rsa', 'e':10000,'pq':24} }</code>.</p>
+		<p>Data from the server is served as a literal object indexed with some of those constants.<br>
+		e.g. <code>{ 'serverURL':"login.php", 'pubKey':{'type':'rsa', 'e':10000,'pq':24} }</code>.</p>
 
-	<p>The normal behavior is to retrieve the protocol from the server and to compare it to the one of this library,
-	in order to know if they're compatible.</p>
-
-	@constructor
+		<p>The normal behavior is to retrieve the protocol from the server and to compare it to the one of this library,
+		in order to know if they're compatible.</p>
 */
+Ciform.protocol = function(){};	// FIXME : this is a fix for this namespace to appear in doc
 Ciform.protocol = {};
 Ciform.protocol.prototype = new Object();
 
@@ -164,7 +150,7 @@ Ciform.Field = function( target, options )
 		Must have a readable <em>value</em> property.
 		@type HTMLElement
 	*/
-	this.in = target instanceof HTMLElement ? target : options['in'];
+	this.input = target instanceof HTMLElement ? target : options['input'];
 
 	/**
 		Output field : the field where to write the encoded text into.
@@ -172,7 +158,7 @@ Ciform.Field = function( target, options )
 		Defaults to {@link #in}.
 		@type HTMLElement
 	*/
-	this.out = $defined(options['out']) ? options['out'] : this['in'];
+	this.output = $defined(options['output']) ? options['output'] : this['input'];
 
 	/**
 		<ul>
@@ -203,10 +189,10 @@ Ciform.Field = function( target, options )
 	{
 		// 1. clears the input value
 		// FIXME ? must respect character set and length of the original field
-		this['in'].value = "";
+		this['input'].value = "";
 
 		// 2. applies the encrypted value to the output field
-		this['out'].value = this._ciphertext;
+		this['output'].value = this._ciphertext;
 	}
 };
 Ciform.Field.prototype = new Object();
@@ -344,10 +330,16 @@ Ciform.Field.prototype = new Object();
 
 
 /**
-	This namespace contains the encoders used by Ciform.<br>
+	@class This namespace contains a wrapper class for each supported encryption method :
+		it's a way to normalize encryption and to provide the upper layer an homogenous API.
+		This is the layer that really deals with the cryptographic functions.<br>
 
-	<p>All encoders must respect the interface defined as {@link Ciform.encoders.Encoder}.</p>
+		<p>One goal of that layer is to provide a set of functions for encrypting data
+		without requiring to know the internals of the choosen cipher.</p>
+
+		<p>All encoders follow the {@link Ciform.encoders.Encoder} interface.</p>
 */
+Ciform.encoders = function(){};	// FIXME : this is a fix for this namespace to appear in doc
 Ciform.encoders = {};
 
 
@@ -687,14 +679,15 @@ Ciform.encoders.CiformPacketizer.prototype.encode = function( message )
 
 
 //
-// CLASS Form
+// CLASS Cipher
 //
 
 
 
 /**
-	@class
-		This class provides a simple way to encrypt different kind of elements (text, form fields, URL)
+	@class This class provides a simple way to encrypt different kind of elements (text, form fields, URL).<br>
+		It has first to be built with options to define the encryption ;
+		then one of its method must be called on the element to encrypt.
 	@constructor
 	@param {Object} options (optional) (and next arguments) (optional)
 		Overrides the default properties and functions of this object.<br>
@@ -891,8 +884,8 @@ Ciform.Cipher.prototype.encryptField = function( target, options )
 
 	// NOTE : localOptions inherit both options specific to the field and those more generic ('commit')
 	var localOptions = merge( {'commit':true}, new Ciform.Field(target), options );
-	var text = localOptions['in'].value;
-	var nodOut = localOptions['out'];
+	var text = localOptions['input'].value;
+	var nodOut = localOptions['output'];
 	var result = false;
 
 	// takes care of the special CSS classes
@@ -916,7 +909,7 @@ Ciform.Cipher.prototype.encryptField = function( target, options )
 		// then a second level with the registered encoder
 		var ciphertext = this.encryptText(text,localOptions); // may throw an exception
 
-		// records the 'out' value for committing
+		// records the 'output' value for committing
 		localOptions._ciphertext = ciphertext;
 
 		if ( localOptions['commit'] )
@@ -1050,18 +1043,18 @@ Ciform.Cipher.prototype.encryptForm = function( target, options )
 			// a first level of protection : only regular fields are allowed
 			if ( el.tagName.toUpperCase() == "INPUT"
 				&& el.type
-				&& !["button","submit","image"].containsNoCase(el.type)
-				&& !equalsNoCase("disabled",el.disabled)
-				&& !equalsNoCase("readonly",el.readonly)	// TODO : check those controls
+				&& !["button","submit","image"].containsValue(el.type,true)
+				&& !equals("disabled",el.disabled,true)
+				&& !equals("readonly",el.readonly,true)	// TODO : check those controls
 				)
 			{
 				// removes any element that does not match the 'allowTypes' filter
-				if ( oktags && !oktags.containsNoCase(el.type) )
+				if ( oktags && !oktags.containsValue(el.type,true) )
 				{
 					fields.splice(f,1);
 				}
 				// removes any element that does not match the 'rejectTypes' filter
-				else if ( noktags && noktags.containsNoCase(el.type) )
+				else if ( noktags && noktags.containsValue(el.type,true) )
 				{
 					fields.splice(f,1);
 				}
@@ -1269,6 +1262,10 @@ Ciform.Cipher.prototype.encryptURL = function( url, options )
 
 
 // /**
+/*			<li>the {@link $ciform} function :<br>
+				It is a shortcut to make the creation of Ciform.Cipher objects less verbose.
+				It returns a {@link Ciform.Cipher} object that can be used as usual.
+			</ul>*/
 // 	<p>This utility function provides a compact way to create a {@link Ciform.Cipher} object.</p>
 // 
 // 	<p>All options to the usual arguments of {@link Ciform.Cipher} are supplied in one 'flat' argument.
