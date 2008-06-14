@@ -2,7 +2,7 @@
 	@fileoverview
 
 	This library provides a very minimalistic set of functions to fill some gaps in the core Javascript language.<br>
-	It should be compatible with most current market's libraries, so that if size would not be a problem it could easily be replaced/enhanced with one of them.<br>
+	It should be compatible with most current market's libraries, so that if size would not be a problem it <em>should</em> easily be replaced/enhanced with one of them.<br>
 
 	@author cbonar at users dot sf dot net
 */
@@ -91,23 +91,12 @@ function equals( o1, o2, noCase )
 
 
 /**
-	@see #equals
-	@type boolean
-*/
-function equalsNoCase( o1, o2 )
-{
-	return equals(o1,o2,true);
-}
-
-
-
-/**
 	@param noCase If the value is a String, use a case insensitive test to search this object
 	@return true if this array contains the given value (not key)
 	@addon
 	@type boolean
 */
-Array.prototype.contains = function( value, noCase )
+Array.prototype.containsValue = function( value, noCase )
 {
 	var notCaseSensitive = noCase ? true : false;
 
@@ -118,18 +107,5 @@ Array.prototype.contains = function( value, noCase )
 	}
 
 	return false;
-}
-
-
-
-/**
-	@see Array#contains
-	@see #equalsNoCase
-	@addon
-	@type boolean
-*/
-Array.prototype.containsNoCase = function( value )
-{
-	return this.contains(value,true);
 }
 
