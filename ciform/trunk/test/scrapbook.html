@@ -6,20 +6,69 @@
 		<script type="text/javascript" src="../lib/rsa.js"></script>
 		<script type="text/javascript" src="../src/minilib.js"></script>
 		<script type="text/javascript" src="../src/ciform.js"></script>
+
+		<!-- some style to play with -->
+		<style type="text/css">
+			input.ciform {
+				background-image:url(../pix/ciform-14x14.gif);
+				background-repeat:no-repeat;
+				background-position: 1px center;
+				padding-left:18px;
+			}
+			input.ciform-working {
+				background-image:url(../pix/ciform-working-14x14.gif);
+				background-repeat:no-repeat;
+				background-position: 1px center;
+				padding-left:18px;
+			}
+			.bluebg { background-color:blue; } 
+			.greenbg { background-color:green; } 
+			.pinkborder { border-width:5px; border-color:pink; } 
+		</style>
 	</head>
 	<body>
+		<h1>Sandbox page for Ciform</h1>
+
+		<p>This is simply a blank page with the required elements to test Ciform loaded :
+		<ul>
+		<li>client side (Javascript) libraries
+		<li>a RSA public key
+		<li>form elements (submit does not do anything)
+		</ul>
+		Use a Javascript debugger like <a href="http://www.getfirebug.com/">Firebug</a> to test Ciform live.</p>
+
 		<fieldset><legend>key1</legend>
-			<script type="text/javascript">
-				var key1 = {'type':'rsa','size':768,'p':[37236049,101016772,159282282,175757624,13024433,250498477,84607479,59966049,22498627,132597430,110924424,205232890,182507213,1044302],'q':[107105531,186247335,15521988,62026032,158753359,206244312,50260951,80974433,210269537,225192697,68222441,99922802,211387762,867338],'e':[65537],'pq':[160070251,12494788,234241229,42365211,94290208,134162236,244093543,74703011,240555106,131172205,88099880,17392319,71011601,227180618,186191532,166269392,147618953,23626137,184395548,183496469,162940002,117707274,143317218,151429299,185738169,204772714,62991596,3374]};
-			</script>
 			<code>var key1 = {'type':'rsa','size':768,'p':[37236049,101016772,159282282,175757624,13024433,250498477,84607479,59966049,22498627,132597430,110924424,205232890,182507213,1044302],'q':[107105531,186247335,15521988,62026032,158753359,206244312,50260951,80974433,210269537,225192697,68222441,99922802,211387762,867338],'e':[65537],'pq':[160070251,12494788,234241229,42365211,94290208,134162236,244093543,74703011,240555106,131172205,88099880,17392319,71011601,227180618,186191532,166269392,147618953,23626137,184395548,183496469,162940002,117707274,143317218,151429299,185738169,204772714,62991596,3374]};</code>
 		</fieldset>
-		<fieldset><legend>form1</legend>
+		<fieldset><legend>form1 (id=form1)</legend>
 		<form id="form1" action="#">
-			text1 : <input type="text" name="text1"><br>
-			password1 : <input type="password" name="password1"><br>
-			<input type="submit" value="SUBMIT">
+			text1 (name=text1, id=id_text1) : <input type="text" name="text1" id="id_text1" class="ciform"><br>
+			password1 (name=password1, id=id_password1) : <input type="password" name="password1" id="id_password1" class="ciform"><br>
+			<input type="submit" value="SUBMIT"><br>
+			<input type="button" onclick="javascript:testRefresh();" value="TEST REFRESH">
 		</form>
 		</fieldset>
+
+		<!-- a few presets to play with -->
+		<script type="text/javascript">
+
+			var key1 = {'type':'rsa','size':768,'p':[37236049,101016772,159282282,175757624,13024433,250498477,84607479,59966049,22498627,132597430,110924424,205232890,182507213,1044302],'q':[107105531,186247335,15521988,62026032,158753359,206244312,50260951,80974433,210269537,225192697,68222441,99922802,211387762,867338],'e':[65537],'pq':[160070251,12494788,234241229,42365211,94290208,134162236,244093543,74703011,240555106,131172205,88099880,17392319,71011601,227180618,186191532,166269392,147618953,23626137,184395548,183496469,162940002,117707274,143317218,151429299,185738169,204772714,62991596,3374]};
+
+			ciformRefresh = new Ciform.Cipher({
+				'pubKey':key1,
+				'onEncryptionStart':function() {
+					$('id_text1').addClass("ciform-working");
+					$('id_text1').refresh();
+				},
+				'onEncryptionEnd':function() {
+					$('id_text1').removeClass("ciform-working");
+				}
+			});
+
+			function testRefresh()
+			{
+				ciformRefresh.encryptField($('id_text1'));
+			}
+		</script>
 	</body>
 </html>
