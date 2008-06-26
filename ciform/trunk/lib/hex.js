@@ -14,7 +14,7 @@ function s2b(s)
  {
   if((sb<<=1) > 255)
   {
-   sb=1; c=s.charCodeAt(sn++);
+   sb=1; var c=s.charCodeAt(sn++);
   }
   if(bn > bm)
   {
@@ -56,7 +56,7 @@ function s2hex(s)
   var result = '';
   for(var i=0; i<s.length; i++)
   {
-    c = s.charCodeAt(i);
+    var c = s.charCodeAt(i);
     result += ((c<16) ? "0" : "") + c.toString(16);
   }
   return result;
