@@ -17,7 +17,7 @@
 
 			function testSHA1Encoder()
 			{
-				var enc = new Ciform.encoders.SHA1Encoder({'preamble':false});
+				var enc = new Ciform.ciphers.SHA1Encoder({'preamble':false});
 				assertEquals("Base64","qUqP5cyxm6YcTAhz05Hph5gvu9M",enc.encode("test"));
 				//var enc = new Ciform.SHA1Encoder("hex");
 				//assertEquals("encode()","a94a8fe5ccb19ba61c4c0873d391e987982fbbd3",enc.encode("test").toLowerCase());
@@ -26,7 +26,7 @@
 			function testRSAEncoder()
 			{
 				var pubKey = { 'type':"rsa", 'e':[17], 'pq':[142235881,93780825,214584072,42027371,203833933,128905630,39039844,39477483,226960049,15] };
-				var enc = new Ciform.encoders.RSAEncoder({'pubKey':pubKey,'preamble':false,'salt':false});
+				var enc = new Ciform.ciphers.RSAEncoder({'pubKey':pubKey,'preamble':false,'salt':false});
 				assertEquals("No salt, no preamble","3c6888c1575418fce66b9ab0a936afd394f702fb1388b04625ab20334c40bbe1",enc.encode("test").toLowerCase());
 			}
 
