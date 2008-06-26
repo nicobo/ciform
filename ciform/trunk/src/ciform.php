@@ -1,4 +1,9 @@
 <?php
+	/**
+	 * This is the PHP server side library for Ciform
+	 * @package ciform
+	 */
+
 	// constants exportable to included scripts
 	define("CIFORM_SESSION","CIFORM");
 	define("CIFORM_PROTOCOL_VERSION",0);
@@ -16,6 +21,7 @@
 
 
 	// TODO : embed the key in the data (e.g. ciform:rsa:keyId:0x12345:0xdd33be2b17813b396d63dd1be9c72e9756bbd8ae5d5555b93a7f4b4fd5a8c80d:salt24325234)
+	// TODO : use the responsibility chain to rewrite this function
 	function ciform_decode( $data, $keyPair, $base=1 )
 	{
 		if ( CIFORM_DEBUG ) echo "ciform_decrypt($data,keyPair,$base)<br>";
