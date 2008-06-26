@@ -8,7 +8,7 @@
 	</p>
 
 	<p>It has 2 layers :<ol>
-		<li>the {@link Ciform.encoders 'encoders' namespace} contains the encoders used by Ciform.
+		<li>the {@link Ciform.ciphers} namespace contains the encoders used by Ciform.
 		 	This is the layer that really deals with the cryptographic functions.<br>
 		<li>the {@link Ciform top, 'user' layer} contains classes dedicated to encryption of the data
 			being exchanged between the client and the server.<br>
@@ -80,6 +80,7 @@ document.getElementById('anAnchor').href = ciform.{@link Ciform.Cipher#encryptUR
 		<p>NOTE : The first letter is in upper case mainly to prevent errors like using 'ciform' to name a variable,
 		and because it should also be considered as an Object containing the definitions of this library.<br>
 		It is not very clean since other namespaces are named with lower case characters, but there's currently no perfect solution in Javascript.</p>
+	@constructor (FIXME : this is a fix for this namespace to appear in doc)
 */
 Ciform = function(){};	// FIXME : this is a fix for this namespace to appear in doc
 Ciform = {};
@@ -94,6 +95,7 @@ Ciform = {};
 
 		<p>The normal behavior is to retrieve the protocol from the server and to compare it to the one of this library,
 		in order to know if they're compatible.</p>
+	@constructor (FIXME : this is a fix for this namespace to appear in doc)
 */
 Ciform.protocol = function(){};	// FIXME : this is a fix for this namespace to appear in doc
 Ciform.protocol = {};
@@ -199,132 +201,8 @@ Ciform.Field.prototype = new Object();
 
 
 
-// TODO
-// Ciform.Target.prototype.encode( encoder )
-// {
-// 	if ( target instanceof HTMLFormElement ) {
-// 		console.debug("Target is a form");
-// 		return this.encryptForm(target,options);
-// 	}
-// 	else if ( Ciform.Options.prototype._isCiformInput(target)  ) {
-// 		console.debug("Target is an input field");
-// 		return this.encryptField(target,options);
-// 	}
-// 	else if ( target instanceof Array ) {
-// 		console.debug("Target is a field array");
-// 		return this.encryptFields(target,options);
-// 	}
-// 	else if ( target instanceof String ) {
-// 		console.debug("Target is a text");
-// 		return this.encryptText(target,options);
-// 	}
-// }
-
-
-
-// /**
-// 	@private
-// 	@param object {any kind of object}
-// 	@return true if the given object is a form input that Ciform accepts
-// */
-// Ciform.prototype._isCiformInput = function( object )
-// {
-// 	return object instanceof HTMLInputElement
-// 		|| object instanceof HTMLSelectElement
-// 		|| object instanceof HTMLTextAreaElement;
-// };
-
-
-
-// Ciform.Target.prototype._computeFields = function()
-// {
-// 	if ( $defined(options) )
-// 	{
-// 		a. determines the target
-// 		var $target = $(target);
-// 		var targetOptions = {};
-// 
-// 		if ( $target instanceof HTMLFormElement ) {
-// 			console.debug("Target is a form");
-// 			targetOptions = {'form':$target};
-// 		}
-// 		else if ( Ciform._isCiformInput($target)  ) {
-// 			console.debug("Target is an input field");
-// 			targetOptions = {'fields':[$target]};
-// 		}
-// 		else if ( $target instanceof Array ) {
-// 			console.debug("Target is a field array");
-// 			targetOptions = {'fields':$target};
-// 		}
-// 
-// }
-
-
-
-// /**
-// 	@private
-// 	Retrieves the form control which name/id is the value of the given key.<br>
-// 
-// 	<p>Will look into the form defined in this object, if any.</p>
-// 
-// 	<p>This is the preferred way to access a form control carried by this object.</p>
-// 
-// 	@param key	the key of the field in this object. The corresponding value may be an id, name or the field itself.
-// 	@param index	the index of the field in the 'fields' property ; if not set, will search directly in this object
-// 	@return the corresponding element or null if not found
-// 	@type HTMLElement
-// */
-// Ciform.Target.prototype._getField = function( key, index )
-// {
-// 	var fieldName = $defined(this.fields) && this.fields[key] && $defined(index) ? this.fields[key][index] : this[key];
-// 	var form = $(this.form);
-// 
-// 	if ( form && form[fieldName] )
-// 	{
-// 		return form[fieldName];
-// 	}
-// 	else
-// 	{
-// 		var field = $(fieldName);
-// 		return this._isCiformInput(field) ? field : null;
-// 	}
-// }
-
-
-
-// /**
-// 	This is the preferred way to access the form element carried by this object.
-// 
-// 	Tries :<ol>
-// 		<li>$(this[key])
-// 		<li>$(key)
-// 		<li>$(this.form)
-// 		</ol>
-// 
-// 	@param key	(optional) the key of the form in this object
-// 	@return the form element or null if the argument doesn't match a form
-// 	@type HTMLFormElement
-// */
-// Ciform.Options.prototype.getForm = function( key )
-// {
-// 	var form = null;
-// 
-// 	if ( $defined(key) )
-// 	{
-// 		form = $(this[key]) ? $(this[key]) : $(key);
-// 	}
-// 	else if ( $defined(this.form) )
-// 	{
-// 		form = $(this.form);
-// 	}
-// 
-// 	return form instanceof HTMLFormElement ? form : null;
-// }
-
-
-
 //
-// NAMESPACE : Ciform.encoders.*
+// NAMESPACE : Ciform.ciphers.*
 //
 
 
@@ -337,19 +215,19 @@ Ciform.Field.prototype = new Object();
 		<p>One goal of that layer is to provide a set of functions for encrypting data
 		without requiring to know the internals of the choosen cipher.</p>
 
-		<p>All encoders follow the {@link Ciform.encoders.Encoder} interface.</p>
+		<p>All encoders follow the {@link Ciform.ciphers.Encoder} interface.</p>
+	@constructor (FIXME : this is a fix for this namespace to appear in doc)
 */
-Ciform.encoders = function(){};	// FIXME : this is a fix for this namespace to appear in doc
-Ciform.encoders = {};
+Ciform.ciphers = function(){};	// FIXME : this is a fix for this namespace to appear in doc
+Ciform.ciphers = {};
 
 
 
 /**
 	@class An encoder provides a way to encode/encrypt a message.
 		Implementations of an encoder must re-define all of the methods of this class.
-	@constructor
 */
-Ciform.encoders.Encoder = function(){
+Ciform.ciphers.Encoder = function(){
 };
 
 
@@ -361,7 +239,7 @@ Ciform.encoders.Encoder = function(){
 	@return the encrypted message (ciphertext) : the result depends on the encoder
 	@type String
 */
-Ciform.encoders.Encoder.prototype.encode = function( message )
+Ciform.ciphers.Encoder.prototype.encode = function( message )
 {
 	return message;
 };
@@ -379,7 +257,7 @@ Ciform.encoders.Encoder.prototype.encode = function( message )
 	@param {Object} options overrides the fields of this object.
 	@constructor
 */
-Ciform.encoders.SHA1Encoder = function( options )
+Ciform.ciphers.SHA1Encoder = function( options )
 {
 
 	/**
@@ -391,15 +269,15 @@ Ciform.encoders.SHA1Encoder = function( options )
 
 	this.extend(options);
 };
-Ciform.encoders.SHA1Encoder.prototype = new Ciform.encoders.Encoder();
+Ciform.ciphers.SHA1Encoder.prototype = new Ciform.ciphers.Encoder();
 
 
 
 /**
-	@see Ciform.encoders.Encoder#encode
+	@see Ciform.ciphers.Encoder#encode
 	@return the sha-1 of the message, base64 encoded, with meta-data about the encoding if {@link #preamble} is true
 */
-Ciform.encoders.SHA1Encoder.prototype.encode = function( message )
+Ciform.ciphers.SHA1Encoder.prototype.encode = function( message )
 {
 	console.debug(this,"encode(",message,")");
 	return (this['preamble'] ? "sha1:b64:" : "") + b64_sha1(message);
@@ -417,7 +295,7 @@ Ciform.encoders.SHA1Encoder.prototype.encode = function( message )
 	@class Formal description of a public RSA key.
 	@constructor
 */
-Ciform.encoders.RSAPublicKey = function()
+Ciform.ciphers.RSAPublicKey = function()
 {
 	// NOTE : this code is a formal description ; it is not functional. It is, however, syntaxically correct.
 
@@ -454,12 +332,12 @@ Ciform.encoders.RSAPublicKey = function()
 	@throws TypeError if the public key was not given or is not correct
 	@constructor
 */
-Ciform.encoders.RSAEncoder = function( options )
+Ciform.ciphers.RSAEncoder = function( options )
 {
 	/**
 		<p>The public key used for asymmetric encryption.</p>
 		<p>REQUIRED (no default value)</p>
-		@type Ciform.encoders.RSAPublicKey
+		@type Ciform.ciphers.RSAPublicKey
 	*/
 	this.pubKey = null;
 
@@ -504,20 +382,20 @@ Ciform.encoders.RSAEncoder = function( options )
 		throw new TypeError("Public key is missing a field : both 'pq' and 'e' are required");
 	}
 };
-Ciform.encoders.RSAEncoder.prototype = new Ciform.encoders.Encoder();
+Ciform.ciphers.RSAEncoder.prototype = new Ciform.ciphers.Encoder();
 
 
 /** @final @type Integer */
-Ciform.encoders.RSAEncoder.prototype.SALT_MAX = 9999;
+Ciform.ciphers.RSAEncoder.prototype.SALT_MAX = 9999;
 /** @final @type Integer */
-Ciform.encoders.RSAEncoder.prototype.SALT_MIN = 1;
+Ciform.ciphers.RSAEncoder.prototype.SALT_MIN = 1;
 
 
 /**
 	@private
 	@type Array[Number]
 */
-Ciform.encoders.RSAEncoder.prototype._getMPI = function()
+Ciform.ciphers.RSAEncoder.prototype._getMPI = function()
 {
 	// this function can be called several times so we don't compute the following each time
 	if ( ! this.pubKey['mpi'] )
@@ -535,7 +413,7 @@ Ciform.encoders.RSAEncoder.prototype._getMPI = function()
 	@return a random number between this.SALT_MIN and this.SALT_MAX
 	@type Number
 */
-Ciform.encoders.RSAEncoder.prototype._getSalt = function()
+Ciform.ciphers.RSAEncoder.prototype._getSalt = function()
 {
 	return Math.floor(Math.random() * (this.SALT_MAX - this.SALT_MIN + 1) + this.SALT_MIN);
 };
@@ -550,9 +428,9 @@ Ciform.encoders.RSAEncoder.prototype._getSalt = function()
 		In case salt is added to the ciphertext, the real max. length might be longer,
 		because the salt has a variable length
 	@type Number
-	@see Ciform.encoders.RSAEncoder#_getSalt
+	@see Ciform.ciphers.RSAEncoder#_getSalt
 */
-Ciform.encoders.RSAEncoder.prototype.maxLength = function()
+Ciform.ciphers.RSAEncoder.prototype.maxLength = function()
 {
 	var s = r2s(this._getMPI());
 	var l = Math.floor((s.charCodeAt(0)*256 + s.charCodeAt(1)+7)/8);
@@ -571,11 +449,11 @@ Ciform.encoders.RSAEncoder.prototype.maxLength = function()
 
 
 /**
-	@see Ciform.encoders.Encoder#encode
+	@see Ciform.ciphers.Encoder#encode
 	@return the ciphertext of the message, encoded with the public RSA key of this encoder, with meta-data about the encoding if this.options['preamble'] is true
 	@throws RangeError if the message is too long to be secure for the current public key (ignored if either 'salt' or 'nopadding' is true)
 */
-Ciform.encoders.RSAEncoder.prototype.encode = function( message )
+Ciform.ciphers.RSAEncoder.prototype.encode = function( message )
 {
 	console.debug(this,"encode(",message,")");
 
@@ -627,18 +505,18 @@ Ciform.encoders.RSAEncoder.prototype.encode = function( message )
 /**
 	@class This encoder simply combine encoders into a chain.
 		For instance, the message will be first hashed through SHA-1, and then encrypted with a RSA key.
-	@param {Array[Ciform.encoders.Encoder]} encoders	A list with the instances of encoders to use (The chain starts with index 0)
+	@param {Array[Ciform.ciphers.Encoder]} encoders	A list with the instances of encoders to use (The chain starts with index 0)
 */
-Ciform.encoders.ChainEncoder = function( encoders )
+Ciform.ciphers.ChainEncoder = function( encoders )
 {
 	/** @private */
 	this.encoders = encoders;
 };
-Ciform.encoders.ChainEncoder.prototype = new Ciform.encoders.Encoder();
+Ciform.ciphers.ChainEncoder.prototype = new Ciform.ciphers.Encoder();
 
 
 
-Ciform.encoders.ChainEncoder.prototype.encode = function( message )
+Ciform.ciphers.ChainEncoder.prototype.encode = function( message )
 {
 	var ciphertext = message;
 
@@ -662,15 +540,15 @@ Ciform.encoders.ChainEncoder.prototype.encode = function( message )
 	@class This encoder makes sure the ciphertext will be a ciform packet.
 	@see Ciform.protocol
 */
-Ciform.encoders.CiformPacketizer = function() {};
-Ciform.encoders.CiformPacketizer.prototype = new Ciform.encoders.Encoder();
+Ciform.ciphers.CiformPacketizer = function() {};
+Ciform.ciphers.CiformPacketizer.prototype = new Ciform.ciphers.Encoder();
 
 
 
 /**
 	Adds {@link Ciform.protocol#PACKET_PREFIX} to the message, if necessary.
 */
-Ciform.encoders.CiformPacketizer.prototype.encode = function( message )
+Ciform.ciphers.CiformPacketizer.prototype.encode = function( message )
 {
 	// only if it doesn't start with the prefix already
 	return new RegExp("^"+Ciform.protocol.PACKET_PREFIX+"(.*)").test(message) ? message : Ciform.protocol.PACKET_PREFIX + message;
@@ -704,8 +582,8 @@ Ciform.Cipher = function( options )
 
 	/**
 		<p>The encoder to use on each of the {@link #targets}</p>
-		<p>Default : a {@link Ciform.encoders.RSAEncoder} inside a {@link Ciform.encoders.CiformPacketizer} <b>if at least the <code>pubKey</code> property is provided in the options</b></p>
-		@type Ciform.encoders.Encoder
+		<p>Default : a {@link Ciform.ciphers.RSAEncoder} inside a {@link Ciform.ciphers.CiformPacketizer} <b>if at least the <code>pubKey</code> property is provided in the options</b></p>
+		@type Ciform.ciphers.Encoder
 	*/
 	this.encoder = null;
 
@@ -777,9 +655,9 @@ Ciform.Cipher = function( options )
 	// NOTE : in the end because it requires the 'pubKey' parameter
 	if ( !this['encoder'] && this['pubKey'] )
 	{
-		this['encoder'] = new Ciform.encoders.ChainEncoder( [
-			new Ciform.encoders.RSAEncoder( merge({'preamble':true,'salt':true},this) ),
-			new Ciform.encoders.CiformPacketizer()
+		this['encoder'] = new Ciform.ciphers.ChainEncoder( [
+			new Ciform.ciphers.RSAEncoder( merge({'preamble':true,'salt':true},this) ),
+			new Ciform.ciphers.CiformPacketizer()
 			]
 		);
 	}
@@ -796,7 +674,7 @@ Ciform.Cipher = function( options )
 	Encrypts a text.<br>
 
 	@param {String} text
-		The message to encode (will also be made 'ciform-encoded' using a {@link Ciform.encoders.CiformPacketizer}).<br>
+		The message to encode (will also be made 'ciform-encoded' using a {@link Ciform.ciphers.CiformPacketizer}).<br>
 		As an alternative, this parameter can be ignored if the text is given in the options.
 	@param {Object} options (optional)
 		An object with the following properties :
@@ -804,6 +682,7 @@ Ciform.Cipher = function( options )
 		<li><code>&lt;{@link String}&gt; text</code> -
 			The text to encrypt
 		</ul>
+	@return null if the text could not be encrypted
 	@type String
 */
 Ciform.Cipher.prototype.encryptText = function( text, options )
@@ -820,8 +699,8 @@ Ciform.Cipher.prototype.encryptText = function( text, options )
 	var result = null;
 
 	// makes sure the result is 'ciform-encoded' by adding a CiformPacketizer at the end
-	if ( !(e instanceof Ciform.encoders.ChainEncoder) || !(e.encoders[e.encoders.length-1] instanceof Ciform.encoders.CiformPacketizer) ) {
-		e = new Ciform.encoders.ChainEncoder([localOptions['encoder'],new Ciform.encoders.CiformPacketizer()]);
+	if ( !(e instanceof Ciform.ciphers.ChainEncoder) || !(e.encoders[e.encoders.length-1] instanceof Ciform.ciphers.CiformPacketizer) ) {
+		e = new Ciform.ciphers.ChainEncoder([localOptions['encoder'],new Ciform.ciphers.CiformPacketizer()]);
 	}
 
 	try
@@ -833,12 +712,14 @@ Ciform.Cipher.prototype.encryptText = function( text, options )
 	catch ( e )
 	{
 		this.onerror(e,localOptions);
+		result = null;
 	}
 	finally
 	{
 		this.onEncryptionEnd(text,localOptions);
-		return result;
 	}
+
+	return result;
 };
 
 
@@ -896,35 +777,42 @@ Ciform.Cipher.prototype.encryptField = function( target, options )
 		localOptions['sha1'] = 1;
 	}
 
+	this.onEncryptionStart(target,localOptions);
 	try
 	{
-		this.onEncryptionStart(target,localOptions);
-
 		// handles a first level of encoding through sha-1 if asked for it
 		if ( localOptions['sha1'] )
 		{
-			text = new Ciform.encoders.SHA1Encoder( {'preamble':localOptions['sha1']==2} ).encode(text);
+			text = new Ciform.ciphers.SHA1Encoder( {'preamble':localOptions['sha1']==2} ).encode(text);
 		}
 
 		// then a second level with the registered encoder
 		var ciphertext = this.encryptText(text,localOptions); // may throw an exception
 
-		// records the 'output' value for committing
-		localOptions._ciphertext = ciphertext;
-
-		if ( localOptions['commit'] )
+		if ( ciphertext != null )
 		{
-			localOptions._commit();
-			result = true;
+			// records the 'output' value for committing
+			localOptions._ciphertext = ciphertext;
+
+			if ( localOptions['commit'] )
+			{
+				localOptions._commit();
+				result = true;
+			}
+			else
+			{
+				result = localOptions;
+			}
 		}
 		else
 		{
-			result = localOptions;
+			result = false;
 		}
 	}
 	catch ( e )
 	{
 		this.onerror(e,localOptions);
+		result = false;
 	}
 	finally
 	{
@@ -950,6 +838,7 @@ Ciform.Cipher.prototype.encryptFields = function( fields, options )
 	console.debug(this,".encryptFields(",fields,options,")");
 
 	var done = [];
+	var result = false;
 
 	try
 	{
@@ -973,17 +862,19 @@ Ciform.Cipher.prototype.encryptFields = function( fields, options )
 		{
 			done[f]._commit();
 		}
+		result = true;
 	}
 	catch ( e )
 	{
 		this.onerror(e,options);
+		result = false;
 	}
 	finally
 	{
 		this.onEncryptionEnd(fields,options);
 	}
 
-	return true;
+	return result;
 };
 
 
@@ -1072,6 +963,7 @@ Ciform.Cipher.prototype.encryptForm = function( target, options )
 	catch ( e )
 	{
 		this.onerror(e,localOptions);
+		result = false;
 	}
 	finally
 	{
@@ -1163,50 +1055,39 @@ Ciform.Cipher.prototype.encryptURL = function( url, options )
 // 	<p>If there is an error during the encryption, none of the field is changed.</p>
 // 
 // 	@param target
-// 		Either a form, a form field or an array of fields to encrypt
-// 	@param arg2	(optional)
+// 		Either a text, a form, a form field or an array of fields to encrypt
+// 	@param options	(optional)
 // 		Options to pass to the encoding method
 // 	@see Ciform.Cipher#encryptForm
 // 	@see Ciform.Cipher#encryptField
 // 	@see Ciform.Cipher#encryptFields
 // 	@see Ciform.Cipher#encryptText
 // 	@return The returned value depends on the target (see the definition of the corresponding function)
-// 	@throws SyntaxError if a target could not be determined
+// 	@throws TypeError if a target could not be determined
 // */
-// Ciform.Cipher.prototype.encrypt = function( options )
+// Ciform.Cipher.prototype.encrypt = function( target, options )
 // {
 // 	console.debug(this,".encrypt(",target,options,")");
 // 
-// 	if ( !$defined(this['targets']) || this['targets'].length<=0 ) {
-// 		throw new TypeError("Ciform : Target is missing");
+// 	if ( target instanceof HTMLFormElement ) {
+// 		console.debug("Target is a form");
+// 		return this.encryptForm(target,options);
+// 	}
+// 	else if ( target instanceof Array ) {
+// 		console.debug("Target is a field array");
+// 		return this.encryptFields(target,options);
+// 	}
+// 	else if ( target instanceof String ) {
+// 		console.debug("Target is a text");
+// 		return this.encryptText(target,options);
+// 	}
+// 	else {
+// 		console.debug("Target should be an input field");
+// 		return this.encryptField(target,options);
 // 	}
 // 
-// 	if ( !$defined(this['encoder']) ) {
-// 		throw new TypeError("Ciform : Encoder is missing");
-// 	}
-// 
-// 	// contains functions that will affect each encoded value to the destination field
-// 	// (permits rollback if an error occurs)
-// 	var targets = this.getTargets();
-// 	for ( var t=0 ; t<targets.length ; t++ )
-// 	{
-// 		var target = targets[t];
-// 
-// 		try
-// 		{
-// 			if ( ! target.encode(this['encoder']) ) {
-// 				throw new Error("There was an error while encoding "+target);
-// 			}
-// 		}
-// 		catch ( e )
-// 		{
-// 			// rolls back what has been recorded
-// 			this.undo(t+1);
-// 			throw e;
-// 		}
-// 	} // iterating over fields is over
-// 
-// 	return true;
+// 	currently never happens because unknown targets are passed to #encryptField
+// 	throw new TypeError("Target "+target+" is not handled");
 // };
 
 
@@ -1271,7 +1152,7 @@ Ciform.Cipher.prototype.encryptURL = function( url, options )
 // 	<p>All options to the usual arguments of {@link Ciform.Cipher} are supplied in one 'flat' argument.
 // 	This is more compact than the object oriented way, but also less clear...</p>
 // 
-// 	@param {Object} options Can contain all fields from {@link Ciform.Cipher}, {@link Ciform.encoders.RSAEncoder}
+// 	@param {Object} options Can contain all fields from {@link Ciform.Cipher}, {@link Ciform.ciphers.RSAEncoder}
 // 	@return a {Ciform.Cipher} object
 // 
 // */
@@ -1293,7 +1174,7 @@ Ciform.Cipher.prototype.encryptURL = function( url, options )
 // 	// default encoder
 // 	var encoder = options['encoder'];
 // 	if ( !$defined(encoder) && $defined(options['pubKey']) ) {
-// 		encoder = new Ciform.encoders.RSAEncoder( merge({'preamble':true,'salt':true},options) );
+// 		encoder = new Ciform.ciphers.RSAEncoder( merge({'preamble':true,'salt':true},options) );
 // 	}
 // 
 // 	// 1st case : two arguments defined
