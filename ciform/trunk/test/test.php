@@ -26,7 +26,9 @@
 
 		<h1>Test page for Ciform</h1>
 
-		<p>This page is for developers to test public features of Ciform.</p>
+		<p>This demo of public features of Ciform is dedicated to developers who whish to understand the internals of Ciform.<br>
+		This is a base that ought to be altered to build complex tests.
+		Therefore don't trust the source code of this page since it may be broken.</p>
 
 		<h2>1. Key generation</h2>
 
@@ -54,7 +56,7 @@
 			// encryption (usually using public key)
 			$enc_data_base64 = $rsa->encrypt($plain_data, $keyPair->getPublicKey());
 			$enc_data_bin = base64_decode($enc_data_base64);
-			$enc_data_hex = bin2hex($enc_data_base64);
+			$enc_data_hex = bin2hex($enc_data_bin);
 
 			// decryption (usually using private key)
 			$dec_data = $rsa->decrypt($enc_data_base64, $keyPair->getPrivateKey());
@@ -146,17 +148,17 @@
 		{
 			var start = new Date();
 
-			// option 1 : in one operation : usefull to put in form.onsubmit
-			Ciform.encrypt( 'myForm', myCiformServer, {'onerror':alert,'fields':[{'in':"in",'out':"out"}]} );
+// 			// option 1 : in one operation : usefull to put in form.onsubmit
+// 			Ciform.encrypt( 'myForm', myCiformServer, {'onerror':alert,'fields':[{'in':"in",'out':"out"}]} );
 
 			// option 2 : instanciates one Ciform per server then encrypt any target
-			var cif = new Ciform.Ciform( myCiformServer, {'onerror':alert} );
-			cif.encryptForm( "myForm", {'tags':"password"} );
-			$('myAnchor').href = cif.encryptURL( $('myAnchor').href, {'fields':"pwd"} );
+			var cif = new Ciform.Cipher( myCiformServer, {'salt':false} );
+			cif.encryptField( $('in'), {'output':$('out')} );
+// 			$('myAnchor').href = cif.encryptURL( $('myAnchor').href, {'fields':"pwd"} );
 
-			// option 3 : attach a Ciform to an element of the page then trigger the encryption
-			var cif = new Ciform.Ciform( "myForm", myCiformServer, {'onerror':alert,'fields':[{'in':"in",'out':"out"}]} );
-			cif.encrypt();
+// 			// option 3 : attach a Ciform to an element of the page then trigger the encryption
+// 			var cif = new Ciform.Ciform( "myForm", myCiformServer, {'onerror':alert,'fields':[{'in':"in",'out':"out"}]} );
+// 			cif.encrypt();
 
 			var end = new Date();
 			//document.getElementById('out').value = ciphertext;
