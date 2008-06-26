@@ -9,6 +9,7 @@ TARGET_LIB=$(TARGET)/lib
 TARGET_API=$(TARGET)/api
 YUI=/opt/yuicompressor/yuicompressor.jar
 JSDOC=/opt/JSDoc/jsdoc.pl
+PHPDOC=/opt/PhpDocumentor/phpdoc
 #LIBHEX=http://www.hanewin.net/encrypt/rsa/hex.js
 #LIBBASE64=http://www.hanewin.net/encrypt/rsa/base64.js
 #LIBSHA1=http://pajhome.org.uk/crypt/md5/sha1.js
@@ -39,9 +40,15 @@ clean:
 	-rm -rf $(TARGET)
 
 .PHONY: doc
-doc:
+doc: jsdoc phpdoc
+
+.PHONY: jsdoc
+jsdoc:
 	-mkdir -p $(TARGET_API)
 	$(JSDOC) -d $(TARGET_API)/js --no-lexical-privates --package-naming --nested-file-naming --logo pix/ciform-flat-48x48.png --project-name Ciform src/*.js
-	#./phpdoc.sh
-	#doxygen ./Doxyfile
+
+.PHONY: phpdoc
+phpdoc:
+	-mkdir -p $(TARGET_API)
+	$(PHPDOC) --directory src,/opt/PEAR/Crypt --target target/api/php/ --output "HTML:Smarty:PHP" --sourcecode on --title "Ciform PHP API documentation" --parseprivate on
 
