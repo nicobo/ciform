@@ -242,7 +242,7 @@ function bmod(p,m) // binary modulo
   if(m[0] < bdm) return [simplemod(p,m[0])];
  }
 
- var r=bdiv(p,m);
+ var r=new bdiv(p,m);
  return r.mod;
 }
 
@@ -284,7 +284,7 @@ function bmodexp(xx,y,m) // binary modular exponentiation
  var mu=new Array(n+1);
 
  mu[n--]=1;
- for(; n>=0; n--) mu[n]=0; mu=bdiv(mu,m).q;
+ for(; n>=0; n--) mu[n]=0; mu=new bdiv(mu,m).q;
 
  for(n=0; n<y.length; n++)
  {
