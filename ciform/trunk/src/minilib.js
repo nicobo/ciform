@@ -109,3 +109,126 @@ Array.prototype.containsValue = function( value, noCase )
 	return false;
 }
 
+
+
+/**
+	Tests the Element to see if it has the passed in className.
+	@see "MooTools" {@link http://docs.mootools.net/Element/Element#Element:hasClass}
+*/
+HTMLElement.prototype.hasClass = function( className )
+{
+	return (" "+this.className+" ").indexOf(" "+className+" ") != -1;
+}
+
+
+
+/**
+	Adds the passed in class to the Element, if the Element doesnt already have it.
+	@see "MooTools" {@link http://docs.mootools.net/Element/Element#Element:addClass}
+*/
+HTMLElement.prototype.addClass = function( className )
+{
+	if ( ! this.hasClass(className) ) {
+		this.className = this.className + " " + className;
+	}
+}
+
+
+
+/**
+	Works like Element:addClass, but removes the class from the Element.
+	@see "MooTools" {@link http://docs.mootools.net/Element/Element#Element:removeClass}
+*/
+HTMLElement.prototype.removeClass = function( className )
+{
+	if ( this.hasClass(className) ) {
+		this.className = (" "+this.className+" ").replace(" "+className+" ","");
+	}
+}
+
+
+
+/**
+	Utility object dedicated to multi-threading, asynchrone calls, ...
+	It should not be used directly.
+	@see Object#delay
+*/
+Thread = {
+	/**
+		An array used to store function calls to be made in an asynchronous way.
+		Use {@link Thread#queue Thread.queue}.push(myfunction)}
+	*/
+	queue: [],
+
+	/**
+		Executes a function stored in the queue.
+		@param i the index of the function in the queue
+		@return the value returned by the function once executed
+	*/
+	execute: function( i ) {
+		console.log(this);
+		return this.queue[i]();
+	}
+}
+
+
+
+/**
+	Delays the execution of a function in time.
+
+	@param {int}	delay	delay in milliseconds
+	@param {Function} func	The function to execute
+	@param arg1		(optional) ... and next args : the arguments to pass to the function when executed
+*/
+function delay( delay, obj, func, arg1 )
+{
+	var args = arguments;
+	var i = Thread.queue.push( function(){ func.apply(obj,args) } ) - 1;
+	setTimeout( "Thread.execute("+i+")", delay );
+}
+
+
+
+/**
+	@see GLOBALS#delay
+*/
+Object.prototype.delay = function( delay, func, arg1 )
+{
+	delay(delay,this,func,arg1);
+}
+
+
+
+/**
+	Attempts forcing refreshing an object on the screen.<br>
+
+	<p>This can be usefull for instance when you want an element to be redrawn on the screen
+	to show a slight change in a CSS property, but there is an intensive Javascript operation
+	going on that takes precedence over graphical redrawing.</p>
+
+	<p><em>WARNING</em> : this operation involves doing a deep copy of the object, which can consume a lot of resources.</p>
+
+	Seen at {@link http://bytes.com/forum/thread612023.html Bytes.com}
+
+	@param {Node} o The object to refresh
+*/
+function refresh( o )
+{
+	// performs a deep copy of the object so that no change will be noticeable on the screen
+	var b = o.cloneNode(true);
+	// the first 'replaceChild' is the operation that should force the web navigator to refresh the object
+	o.parentNode.replaceChild(b,o);
+	// the second 'replaceChild' ensures that the references to the object will be left unchanged
+	b.parentNode.replaceChild(o,b);
+}
+
+
+
+/**
+	@see GLOBALS#refresh
+*/
+Object.prototype.refresh = function()
+{
+	refresh(this);
+}
+
