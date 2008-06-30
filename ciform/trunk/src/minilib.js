@@ -1,11 +1,26 @@
+//////////////////////////////////////////////////////////////////////////////////
+//
+// minilib.js
+//
+// Copyright © 2008 Nicolas BONARDELLE <http://nicobo.net/contact>
+//
+
+
+
 /**
 	@fileoverview
 
 	This library provides a very minimalistic set of functions to fill some gaps in the core Javascript language.<br>
 	It should be compatible with most current market's libraries, so that if size would not be a problem it <em>should</em> easily be replaced/enhanced with one of them.<br>
 
-	@author cbonar at users dot sf dot net
+	@author Nicolas BONARDELLE &lt;<a href="http://nicobo.net/contact">http://nicobo.net/contact</a>&gt;
 */
+
+
+
+//
+// ELEMENT SELECTION
+//
 
 
 
@@ -33,6 +48,12 @@ function $( fieldName )
 {
 	return typeof fieldName == "object" ? fieldName : document.getElementById(fieldName);
 }
+
+
+
+//
+// OBJECTS AND COLLECTIONS MANIPULATION
+//
 
 
 
@@ -111,6 +132,12 @@ Array.prototype.containsValue = function( value, noCase )
 
 
 
+//
+// DHTML UTILITIES
+//
+
+
+
 /**
 	Tests the Element to see if it has the passed in className.
 	@see "MooTools" {@link http://docs.mootools.net/Element/Element#Element:hasClass}
@@ -145,6 +172,12 @@ HTMLElement.prototype.removeClass = function( className )
 		this.className = (" "+this.className+" ").replace(" "+className+" ","");
 	}
 }
+
+
+
+//
+// PATCHES, TRICKS
+//
 
 
 
