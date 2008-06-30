@@ -50,5 +50,5 @@ jsdoc:
 .PHONY: phpdoc
 phpdoc:
 	-mkdir -p $(TARGET_API)
-	$(PHPDOC) --directory src,/opt/PEAR/Crypt --target target/api/php/ --output "HTML:Smarty:PHP" --sourcecode on --title "Ciform PHP API documentation" --parseprivate on
+	$(PHPDOC) --directory src,/opt/PEAR/Crypt --pear --target target/api/php/ --output "HTML:Smarty:PHP" --sourcecode on --title "Ciform PHP API documentation" --parseprivate on
 
