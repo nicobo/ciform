@@ -35,7 +35,7 @@ define("CIFORM_SESSION","CIFORM");
 define("CIFORM_PROTOCOL_VERSION","0");
 
 /** If the request contains a parameter with this name, this script will print out the Ciform protocol rather than doing decryption */
-define("CIFORM_REQUEST_PROTOCOL","protocol");
+define("CIFORM_REQUEST_PROTOCOL","ciform-protocol");
 
 if ( ! defined("CIFORM_AUTODECRYPT") )
 	/** Define this constant to TRUE in caller script to enable transparent decryption of the request */
@@ -106,7 +106,7 @@ class ciform_Server
 	/**
 	 * @return array the current Ciform protocol
 	 */
-	function getProtocol()
+	function export()
 	{
 		// FIXME : serverURL must be absolute, so scripts can call it from other servers
 		$serverURL = $_SERVER['PHP_SELF'];
@@ -114,7 +114,7 @@ class ciform_Server
 		$schemes = array();
 		foreach ( $this->codec->ciphers as $cipher )
 		{
-			$schemes[$cipher->getName()] = $cipher->getParameters();
+			$schemes[$cipher->getName()] = $cipher->export();
 		}
 
 		$protocol = array(
@@ -147,12 +147,12 @@ if ( isset($_REQUEST[CIFORM_REQUEST_PROTOCOL]) )
 	// if a name was given, use it to name the variable :
 	// the result may be used as a full (java)script
 	if ( trim($name) != "" ) {
-		echo "var $name = " . json_encode($ciform->getProtocol()) . ";";
+		echo "var $name = " . json_encode($ciform->export()) . ";";
 	}
 	// if no name was given, just print the JSON value :
 	// the result may be used as an Ajax response
 	else {
-		echo json_encode($ciform->getProtocol());
+		echo json_encode($ciform->export());
 	}
 
 	exit;

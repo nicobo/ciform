@@ -42,7 +42,7 @@ class Ciform_Scheme extends crypto_Cipher
 	 */
 	var $name;
 
-	Ciform_Scheme( $name )
+	function Ciform_Scheme( $name )
 	{
 		if ( defined($name) ) {
 			$this->name = $name;
@@ -55,6 +55,21 @@ class Ciform_Scheme extends crypto_Cipher
 	function getName()
 	{
 		return $this->name;
+	}
+
+	/**
+	 * This method provides a representation of this object to send to the client.<br>
+	 *
+	 * <p>The clients will be provided this representation, which must contain all information
+	 * necessary to the correct transmission of encrypted informations to (and from) this server.</p>
+	 *
+	 * <p>Since it is carried by each scheme, different implementations of the same scheme must return the same kind of data.</p>
+	 *
+	 * @return array The crucial properties of this object in an array. Defaults to an empty array.
+	 */
+	function export()
+	{
+		return array();
 	}
 
 	/**
@@ -94,12 +109,13 @@ class Ciform_CipherChain extends Ciform_Scheme
 	 */
 	var $ciphers;
 
+
 	/**
 	 * @param array $ciphers	The list of the internal {@link crypto_Cipher}s in this chain
 	 */
-	function Ciform_CipherChain( $ciphers, $name="schemes" )
+	function Ciform_CipherChain( $ciphers )
 	{
-		parent::Ciform_Scheme($name);
+		parent::Ciform_Scheme(NULL);
 		$this->ciphers = $ciphers;
 	}
 
@@ -113,14 +129,12 @@ class Ciform_CipherChain extends Ciform_Scheme
 	 */
 	function chainDecode( $packet )
 	{
-		$message = $ciphertext;
-
 		foreach ( $this->ciphers as $decoder )
 		{
 			// The first decoder accepting the ciphertext is the good one, we don't need to go further.
-			if ( $message = $decoder->decode($message,$this) )
+			if ( $cleartext = $decoder->decode($packet,$this) )
 			{
-				return $message;
+				return $cleartext;
 			}
 		}
 
@@ -137,6 +151,8 @@ class Ciform_CipherChain extends Ciform_Scheme
 	 */
 	function decode( $packet )
 	{
+		if ( CIFORM_DEBUG ) echo print_r($this,TRUE)."->decode($packet)"."\n";
+
 		// this outer loop tells to continue while the message is still encoded and handled by one of the decoders
 		for ( $message1 = $packet ; $message2 = $this->chainDecode($message1) ; $message1 = $message2  );
 
@@ -218,7 +234,7 @@ class Ciform_Codec extends Ciform_Scheme
 	 */
 	function decode( $packet, $chain=FALSE )
 	{
-	 	if ( CIFORM_DEBUG ) { echo print_r($this,TRUE),"->decode($packet,",print_r($chain,TRUE),")"."\n"; }
+	 	if ( CIFORM_DEBUG ) { echo print_r($this,TRUE),"->decode($packet,<chain>)"."\n"; }
 
 		// uses the internal chain (if any) if the chain was not given as an argument
 		$myChain = $chain ? $chain : ($this->chain ? $this->chain : FALSE);
@@ -257,7 +273,7 @@ class Ciform_Codec extends Ciform_Scheme
 			}
 		}
 
-	 	if ( CIFORM_DEBUG ) { echo "unpacked=".print_r($this->unpack($packet),TRUE)."\n"; }
+	 	if ( CIFORM_DEBUG ) { echo "unpacked=$unpacked"."\n"; }
 
 		// if no decoder was found, this object does not handle this scheme
 		return FALSE;
@@ -379,7 +395,7 @@ class Ciform_schemes_Base64 extends Ciform_SimpleScheme
 	 */
 	function Ciform_schemes_Base64( $unpackOnly=FALSE )
 	{
-		parent::Ciform_SimpleScheme("base64",'/^(?:base64|b64):(.*)$/',$unpackOnly);
+		parent::Ciform_SimpleScheme("base64",'/^(?:base64|b64):(.*)$/i',$unpackOnly);
 	}
 
 	function getDecoder( $packet )

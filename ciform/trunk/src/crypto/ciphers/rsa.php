@@ -8,27 +8,19 @@
 require_once "crypto/ciphers/core.php";
 require_once("Crypt/RSA.php");
 
-define("CIFORM_RSA_KEYTYPE","rsa");
-define("CIFORM_RSA_KEYSIZE",768);
-define("CIFORM_RSA_KEYSTORE","keys");
-define("CIFORM_RSA_KEYFILE_PEM",CIFORM_RSA_KEYSTORE."/protected/key-rsa.pem");
-define("CIFORM_RSA_KEYFILE_JS",CIFORM_RSA_KEYSTORE."/key-rsa.pub.json");
-define("CIFORM_RSA_REQUEST_GENKEY","ciform-genkey");
-define("CIFORM_SESSION_KEYPAIR","KEYPAIR");	// TODO : move to ciform_rsa.php
-/** */
-define("CIFORM_KEYTYPE",CIFORM_RSA_KEYTYPE);	// choose the desired encryption module here
+
+/** Name of the entry in $_SESSION that will hold the current RSA key pairs */
+define("CIFORM_RSA_SESSION_KEYRING","CIFORM_RSA_SESSION_KEYRING");
+/** Default size, in bits, of the keys to generate */
+define("CIFORM_RSA_DEFAULT_KEYSIZE",768);
+/** Path to the .PEM file containing the default key pair */
+define("CIFORM_RSA_DEFAULT_PEMFILE","keys/protected/key-rsa.pem");
+/** Path to the .json file containing the default public key */
+define("CIFORM_RSA_DEFAULT_JSFILE","keys/key-rsa.pub.json");
 
 
 // TODO : embed the key in the data (e.g. ciform:rsa:keyId:0x12345:0xdd33be2b17813b396d63dd1be9c72e9756bbd8ae5d5555b93a7f4b4fd5a8c80d:salt24325234)
 
-
-//
-// RSA SPECIAL HANDLING : Since this is the default encryption,
-// the script will retrieve the keys or generated them if not found.
-//
-// TODO : instanciate the given crypto class,
-// which stores itself the key and all other specific data
-// then, move the following code to the correct sub-script
 if ( !isset($_SESSION[CIFORM_SESSION]) )
 {
 	$_SESSION[CIFORM_SESSION] = array();
@@ -43,22 +35,26 @@ if ( !isset($_SESSION[CIFORM_SESSION][CIFORM_SESSION_KEYPAIR]) )
 
 
 /**
- * This class extends Crypt_RSA_KeyPair by adding conversion functions to Javascript and to the Ciform protocol
+ * This class extends Crypt_RSA_KeyPair by adding conversion functions in order to conform to the Ciform protocol
+ *
+ * @package ciform
+ * @subpackage schemes.rsa
  */
-class Ciform_ciphers_rsa_KeyPair extends Crypt_RSA_KeyPair
+class crypto_ciphers_rsa_KeyPair extends Crypt_RSA_KeyPair
 {
 	/**
-	 * Transforms a big integer value into a JSON array of 28 bits integers
+	 * Transforms a big integer value into an array of 28 bits integers
 	 *
 	 * @param string $binValue		The raw, binary string value of the big integer
 	 * @param Crypt_RSA_Math_* $math	Optional math wrapper to use to manipulate large integers. Will use the current one if not specified.
 	 * @see Crypt_RSA_KeyPair::$_math_obj
-	 * @return string The number as a JSON structure
+	 * @return array The number as an array of 28 bits integers
 	 * @access private
+	 * @static
 	 */
-	function bigInt2Json( $binValue, $math=$this->_math_obj )
+	function bigInt2Array( $binValue, $math=$this->_math_obj )
 	{
-		$json = "[";
+		$export = array();
 
 		$intValue = $math->bin2int($binValue);
 		$szBits = $math->bitLen($intValue);	// total length, in bits
@@ -66,15 +62,11 @@ class Ciform_ciphers_rsa_KeyPair extends Crypt_RSA_KeyPair
 		for ( $b=0 ; $b<$szBits ; )
 		{
 			$l = min(28,$szBits-$b);
-			$json .= $math->subint($intValue, $b, $l);
+			$export[$b] = $math->subint($intValue, $b, $l);
 			$b += $l;
-			if ( $b<$szBits )
-			{
-				$json .= ",";
-			}
 		}
 
-		return $json."]";
+		return $export;
 	}
 
 
@@ -86,18 +78,18 @@ class Ciform_ciphers_rsa_KeyPair extends Crypt_RSA_KeyPair
 	 * @return array			The public key as an associative array
 	 * @access private
 	 */
-	function exportPubKey( $keyPair=$this )
+	function pubKey2Array( $keyPair=$this )
 	{
 		$pubKey = $keyPair->getPublicKey();
 		$math = $keyPair->_math_obj;
-		$p = Ciform_RSA_KeyPair::bigInt2Json($keyPair->_attrs['p'],$math);
-		$q = Ciform_RSA_KeyPair::bigInt2Json($keyPair->_attrs['q'],$math);
-		$e = Ciform_RSA_KeyPair::bigInt2Json($pubKey->getExponent(),$math);
-		$pq = Ciform_RSA_KeyPair::bigInt2Json($pubKey->getModulus(),$math);
+		$p = crypto_ciphers_rsa_KeyPair::bigInt2Array($keyPair->_attrs['p'],$math);
+		$q = crypto_ciphers_rsa_KeyPair::bigInt2Array($keyPair->_attrs['q'],$math);
+		$e = crypto_ciphers_rsa_KeyPair::bigInt2Array($pubKey->getExponent(),$math);
+		$pq = crypto_ciphers_rsa_KeyPair::bigInt2Array($pubKey->getModulus(),$math);
 		//$mpi = base64_encode($math->bin2int($pubKey->getModulus())+$math->bin2int($pubKey->getExponent()));
 
 		$export = array(
-			'type' =>  CIFORM_RSA_KEYTYPE,
+			'type' =>  "rsa",
 			'size' => $pubKey->getKeyLength(),	// size of the key, in bits
 			'p' => $p,				// prime factor p, as an array of 28 bits integers
 			'q' => $q,				// prime factor q, as an array of 28 bits integers
@@ -116,7 +108,7 @@ class Ciform_ciphers_rsa_KeyPair extends Crypt_RSA_KeyPair
 	 *
 	 * @param Crypt_RSA_KeyPair $keyPair The key pair to copy
 	 * @return $this
-	 * @todo This implementation depends totally on the version of the superclass :
+	 * FIXME This implementation totally depends on private parts of the superclass :
 	 * 	if a field is added or removed, this method can very possibly fail to do its job
 	 * @private
 	 */
@@ -161,12 +153,18 @@ class Ciform_ciphers_rsa_KeyPair extends Crypt_RSA_KeyPair
 	 * @access private
 	 * @static
 	 */
-	function genKeyPair( $keySize, $pemFilename, $jsFilename, $force=FALSE )
+	function getInstance( $keyId, $keySize, $pemFilename, $jsFilename, $force=FALSE )
 	{
-		// if the key has been stored to a file, get it from there
+		// first of all, if the key is in the current session, retrieve it
+		if ( isset($keyId) && isset($_SESSION[CIFORM_RSA_SESSION_KEYRING][$keyId]) )
+		{
+			return $_SESSION[CIFORM_RSA_SESSION_KEYRING][$keyId];
+		}
+
+		// second chance : if the key has been stored to a file, get it from there
 		if ( $contents = @file_get_contents($pemFilename) )
 		{
-			return Ciform_RSA_KeyPair::fromPEMString($contents);
+			return crypto_ciphers_rsa_KeyPair::fromPEMString($contents);
 		}
 
 		// else, generate a new key and try to store it to a file
@@ -202,80 +200,69 @@ class Ciform_ciphers_rsa_KeyPair extends Crypt_RSA_KeyPair
 
 
 
-/**
- * Ciform handler using the RSA cipher
- */
-class Ciform_RSA extends Ciform_
+class crypto_ciphers_RSA extends crypto_Cipher
 {
-	
+	var $keyPair;
+	var $cipher;
 
-	/**
-	 * @return Ciform_RSA_KeyPair the current key pair (or a new one if none defined)
-	 */
-	function getKeyPair()
+
+	function crypto_ciphers_RSA( $keyPair )
 	{
-		if ( CIFORM_DEBUG ) echo "ciform_rsa_getKeyPair() = ";
-		$keyPair = Ciform_RSA_KeyPair::genKeyPair(CIFORM_RSA_KEYSIZE, CIFORM_RSA_KEYFILE_PEM, CIFORM_RSA_KEYFILE_JS);
-		if ( CIFORM_DEBUG ) print_r($keyPair);
-		return $keyPair;
-	}
+		if ( CIFORM_DEBUG ) echo "new crypto_ciphers_RSA()<br>";
 
+		$this->keyPair = $keyPair;
 
-
-	/**
-	 * @return string the current Ciform protocol
-	 */
-	function getProtocol()
-	{
-					'pubKey' => $keyPair->exportPubKey(),
-
-		if ( CIFORM_DEBUG ) echo "ciform_rsa_getProtocol() = ";
-		// FIXME : serverURL must be absolute, so scripts can call it from other servers
-		$serverURL = $_SERVER['PHP_SELF'];
-		$keyPair = Ciform_RSA::getKeyPair();
-		$protocol = "{
-			'VERSION':".CIFORM_PROTOCOL_VERSION.",
-			'PACKET_PREFIX':'".CIFORM_REQUEST_PREFIX."',
-			'serverURL':'".str_replace("'","\\'",$serverURL)."',
-			'pubKey':".$keyPair->pubKey2Json()
-			."}";
-		if ( CIFORM_DEBUG ) print_r($protocol);
-		return $protocol;
-	}
-
-
-
-	/**
-	 *
-	 */
-	function decrypt( $data, $keyPair )
-	{
-		if ( CIFORM_DEBUG ) echo "ciform_rsa_decrypt($data,keyPair)<br>";
-		$privateKey = $keyPair->getPrivateKey();
 		// TODO make the math object configurable, because there are big differences between them and to offer better compatibility
-		$rsa = new Crypt_RSA($privateKey->getKeyLength(),'BCMath');
-		return $rsa->decrypt($data,$privateKey);
+		$this->cipher = new Crypt_RSA($this->getPrivateKey->getKeyLength(),'BCMath');
+
+		if ( CIFORM_DEBUG ) echo "keyPair=".print_r($keyPair,TRUE)."<br>";
+	}
+
+
+	function &getInstance( $keyId, $keySize=CIFORM_RSA_KEYSIZE, $pemFile=CIFORM_RSA_KEYFILE_PEM, $jsFile=CIFORM_RSA_KEYFILE_JS, $forceGen=FALSE )
+	{
+		return new crypto_ciphers_RSA( crypto_ciphers_rsa_KeyPair::getInstance($keyId,$keySize,$pemFile,$jsFile,$forceGen) );
+	}
+
+
+	function decode( $ciphertext )
+	{
+		if ( CIFORM_DEBUG ) echo print_r($this,TRUE)."->decode($ciphertext)<br>";
+
+		return $rsa->decrypt( $ciphertext, $keyPair->getPrivateKey() );
 	}
 }
 
 
 
-
-
-
-
-
+/**
+ * Ciform handler using the RSA cipher
+ */
 class Ciform_schemes_RSA extends Ciform_SimpleScheme
 {
-	function Ciform_schemes_RSA()
+	var $keyId;
+	var $keySize;
+	var $pemFile;
+	var $jsFile;
+	var $forceGen;
+
+
+	function Ciform_schemes_RSA( $keyId=NULL, $keySize=CIFORM_RSA_KEYSIZE, $pemFile=CIFORM_RSA_KEYFILE_PEM, $jsFile=CIFORM_RSA_KEYFILE_JS, $forceGen=FALSE )
 	{
 		parent::Ciform_SimpleScheme("rsa",'/^rsa:(.*)(:.+)?$/i');
+		$this->keyId = $keyId;
+		$this->keySize = $keySize;
+		$this->pemFile = $pemFile;
+		$this->jsFile = $jsFile;
+		$this->forceGen = $forceGen;
 	}
+
 
 	function export()
 	{
-		return array( 'pubKey' => $keyPair->exportPubKey() );
+		return array( 'pubKey' => $this->getKeyPair()->pubKey2Array() );
 	}
+
 
 	function getDecoder( $packet )
 	{
@@ -283,26 +270,11 @@ class Ciform_schemes_RSA extends Ciform_SimpleScheme
 
 		if ( $this->unpack($packet) )
 		{
-			return new crypto_ciphers_Base64();
+			return crypto_ciphers_RSA::getInstance( $this->keyId, $this->keySize, $this->pemFile, $this->jsFile, $this->forceGen );
 		}
 
 		return FALSE;
 	}
-}
-
-
-
-
-
-
-
-
-
-
-// keypair generation is forced if this parameter is set
-if ( isset($_SESSION[CIFORM_RSA_REQUEST_GENKEY]) )
-{
-	$_SESSION[CIFORM_SESSION][CIFORM_SESSION_KEYPAIR] = Ciform_RSA_KeyPair::genKeyPair(CIFORM_RSA_KEYSIZE, CIFORM_RSA_KEYFILE_PEM, CIFORM_RSA_KEYFILE_JS, TRUE);
 }
 
 ?>
