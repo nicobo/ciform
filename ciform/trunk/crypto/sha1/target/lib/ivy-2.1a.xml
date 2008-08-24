@@ -1,0 +1,20 @@
+<ivy-module version="2.0">
+    <info organisation="crypto" module="sha1" revision="2.1a" status="integration" publication="20080825005413">
+        <license name="Copyright 2000 - 2002 Paul Johnston" url="http://pajhome.org.uk/crypt/md5/"/>
+        <license name="BSD License" url="http://pajhome.org.uk/site/legal.html#bsdlicense"/>
+        <ivyauthor name="Nicolas BONARDELLE" url="http://nicobo.net/contact?subject=crypto+sha1+ivy"/>
+        <repository name="plugnauth@sourceforge" url="http://plugnauth.sourceforge.net/ivy" ivys="true" artifacts="true"/>
+        <description homepage="http://plugnauth.sourceforge.net/crypto">
+            This library provides an implementation of the SHA-1 hash algorithm.
+        </description>
+    </info>
+    <publications>
+        <!-- The source script as plain text, including all inner informations and comments. -->
+        <artifact name="sha1" type="javascript" ext="js"/>
+        <!-- An obfuscated, size-reduced version of the script. Use to speed up loading time in final environment. -->
+        <artifact name="sha1-compressed" type="javascript" ext="js"/>
+    </publications>
+    <dependencies>
+        <!-- no dependency required -->
+    </dependencies>
+</ivy-module>
