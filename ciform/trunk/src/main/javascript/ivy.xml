@@ -1,0 +1,25 @@
+<ivy-module version="2.0">
+    <info organisation="ciform" module="javascript" status="integration">
+        <license name="LGPL" url="http://plugnauth.sf.net/ciform/license" />
+        <ivyauthor name="Nicolas BONARDELLE" url="http://nicobo.net/contact?subject=ciform+ivy" />
+        <repository name="plugnauth@sourceforge" url="http://plugnauth.sourceforge.net/ciform/ivy" ivys="true" artifacts="true" />
+        <description homepage="http://plugnauth.sourceforge.net/ciform">
+            Ciform encrypts web forms before they are submitted, so data is not sent in clear text over the Internet.
+        </description>
+    </info>
+    <configurations>
+      <conf name="standalone"/>
+      <conf name="plain"/>
+    </configurations>
+    <publications>
+      <artifact name="libciform" ext="js" conf="standalone" />
+      <artifact name="ciform" ext="js" conf="plain" />
+    </publications>
+    <dependencies>
+      <dependency name="version" rev="latest.integration" conf="core->default" />
+      <dependency name="list" rev="latest.integration" conf="core" />
+      <dependency name="minilib" rev="latest.integration" conf="plain->plain;standalone->compressed" />
+      <dependency org="crypto" name="rsa" rev="latest.integration" conf="plain->plain;standalone->compressed" />
+      <dependency org="crypto" name="sha1" rev="latest.integration" conf="plain->plain;standalone->compressed" />
+    </dependencies>
+</ivy-module>

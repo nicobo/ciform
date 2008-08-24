@@ -4,7 +4,7 @@
 </head>
 <body><pre>
 <?php
- 	ini_set("include_path", ini_get("include_path").PATH_SEPARATOR."/home/cbonar/src/ciform/src" );
+	ini_set("include_path", ini_get("include_path").PATH_SEPARATOR."/home/cbonar/src/ciform/src" );
 	require_once 'PHPUnit/Framework.php';
 	require_once "ciform/schemes/core.php";
 

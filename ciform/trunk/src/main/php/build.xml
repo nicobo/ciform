@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ciform" default="all" basedir="." basedir=".">
+
+    <!-- Code review and standards compliance -->
+    <target name="php-codesniffer">
+        <exec executable="phpcs" dir="${basedir}/source" output="${basedir}/build/logs/checkstyle.xml">
+            <arg line="--report=checkstyle --standard=PEAR --ignore=src/autoload src/"/>
+        </exec>
+    </target>
+
+    <!-- Documentation for PHPUnderControl -->
+    <target name="php-documentor">
+        <exec executable="phpdoc" dir="${basedir}/source">
+            <arg line="-ct type -ue on -t ${basedir}/build/api -tb /PATH/TO/YOUR/PHPUC/DATA/phpdoc -o HTML:Phpuc:phpuc -d src/"/>
+        </exec>
+    </target>
+    <!-- Documentation for PEAR -->
+    <target name="php-documentor">
+        <exec executable="phpdoc" dir="${basedir}/source">
+            <arg line="-p on -f /path/to/my/package/source/File.php -t . -o 'XML:DocBook/peardoc2:default' -dc myPackageCategory"/>
+        </exec>
+    </target>
+    <!-- Documentation for web site -->
+    <target name="php-documentor">
+        <exec executable="phpdoc" dir="${basedir}/source">
+            <arg line="-ct type -ue on -t ${basedir}/build/api -tb /PATH/TO/YOUR/PHPUC/DATA/phpdoc -o HTML:Phpuc:phpuc -d src/"/>
+        </exec>
+    </target>
+
+</project>
