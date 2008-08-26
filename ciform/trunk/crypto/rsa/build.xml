@@ -91,4 +91,12 @@
         <delete includeemptydirs="true" dir="${target.dir}"/>
     </target>
 
+
+    <!-- ==================== -->
+    <!-- CruiseControl targets -->
+    <!-- ==================== -->
+    
+    <target name="cruisecontrol-build" depends="verify">
+    </target>
+
 </project>
