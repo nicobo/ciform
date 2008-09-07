@@ -4,7 +4,19 @@
    This script is an Ant script using Ivy extension to resolve dependencies.
    You will need both Ant (http://ant.apache.org/) and Ivy (http://ant.apache.org/ivy) to use it.
 -->
-<project name="crypto.sha1" default="package" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="sha1" default="verify" xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <!--
+        Runs JsUnit tests. This target saves a lot of verbosity in the projects' build scripts.
+        
+        Firefox 3 users : change the security.fileuri.strict_origin_policy parameter to 'false' for the following target to work
+        
+        // static configuration
+        @in jsunit.dir          the directory where JsUnit resides
+        @in jsunit.coreJs       the jsUnitCore.js file
+        @in jsunit.testRunner   the test runner's HTML page
+        -->
+    <taskdef name="jsunit" classname="net.jsunit.ant.StandaloneTestTask" classpath="/home/cbonar/src/jsunit/java/bin" />
 
     <!-- ==================== -->
     <!-- Settings -->
@@ -19,108 +31,135 @@
 
 
     <!-- ==================== -->
-    <!-- Main targets : they are greatly inspired from the Maven build lifecycle -->
+    <!-- Public targets : they are greatly inspired from the Maven build lifecycle -->
     <!-- ==================== -->
+
+
+    <target name="clean" description="Restores the initial state of the project, deleting any generated file.">
+        <delete includeemptydirs="true" dir="${target.dir}"/>
+        <delete includeemptydirs="true" dir="${build.dir}"/>
+    </target>
+
 
     <target name="validate" description="Validates the project is correct and all necessary information is available.">
         <!-- Retreives dependencies with ivy -->
         <ivy:retrieve/>
         <!-- Creates necessary directories -->
-        <mkdir dir="${target.dir}" />
-        <delete dir="${build.dir}"/>
         <mkdir dir="${build.dir}"/>
+        <mkdir dir="${target.dir}" />
     </target>
-    
+
+
     <target name="compile" depends="validate" description="Compiles the source code of the project.">
-        <!-- nothing to do -->
+
+        <!-- We use this target to copy all required files for the tests together in a consistent hierarchy -->
+        <!--
+        <copy file="${jsunit.coreJs}" todir="${jsunit.tmp}"/>
+        <copy todir="${jsunit.tmp}" overwrite="true">
+            <resources refid="jsunit.in.files"/>
+        </copy>
+        -->
+
     </target>
-    
-    <!--
-        Firefox 3 users : change the security.fileuri.strict_origin_policy parameter to 'false' for the following target to work
-    -->
-    <target name="test" depends="compile" description="Tests the compiled source code using a suitable unit testing framework. These tests should not require the code be packaged or deployed.">
-        <!-- 1. Copies all files required for the tests in a working directory -->
-        <tempfile property="tests.tmp" prefix="test-" suffix=".tmp" destDir="${build.dir}"/>
-        <copy file="${jsunit.core}" todir="${tests.tmp}"/>              <!-- JsUnit's core library -->
-        <copy file="${src.dir}/sha1.js" todir="${tests.tmp}"/>          <!-- The library to test -->
-        <copy file="${tests.dir}/AllTests.html" todir="${tests.tmp}"/>  <!-- The unit tests -->
-        <!-- 2. Calls the JsUnit target against our unit tests -->
-        <mkdir dir="${tests.logs}"/>
-        <junit showoutput="true"
-               fork="true"
-               errorproperty="jsunit.error"
-               failureproperty="jsunit.failed"
-               printsummary="on"
-               dir="${tests.tmp}">
+
+
+    <!-- NOTE : These tests should not require the code be packaged or deployed. -->
+    <target name="test" depends="compile" description="Tests the compiled source code using a suitable unit testing framework.">
+
+        <jsunit showoutput="true"
+                printsummary="true"
+                filtertrace="false"
+                jsUnitRoot="${jsunit.dir}"
+                haltonfailure="true"
+                haltonerror="true"
+                >
+            <sysproperty key="browserFileNames" value="${jsunit.browsers}"/>
+            <sysproperty key="port" value="45678"/>
+            <sysproperty key="logsDirectory" value="${tests.logs}"/>
+            <test todir="${tests.logs}">
+                <fileset dir="${src.dir}" includes="**/*.js"/>
+                <fileset dir="${tests.dir}" includes="**/*.js"/>
+            </test>
+            <!--
+            <scripts dir="${src.dir}" includes="**/*.js"/>
+            <scripts dir="${tests.dir}" includes="**/*.js"/>
+            -->
             <classpath>
                 <fileset dir="${jsunit.dir}/java/lib">
                     <include name="*.jar"/>
                 </fileset>
-                <fileset dir="${jsunit.dir}/java/bin">
-                    <include name="jsunit.jar"/>
-                </fileset>
+                <!--
+                    <fileset dir="${jsunit.dir}/java/bin">
+                        <include name="jsunit.jar"/>
+                    </fileset>
+                -->
+                <dirset dir="/home/cbonar/src/jsunit/java/bin"/>
                 <dirset dir="${jsunit.dir}/java/config"/>
             </classpath>
             <formatter type="xml"/>
-            <sysproperty key="browserFileNames" value="${jsunit.browsers}"/>
-            <!--sysproperty key="logsDirectory" value="${tests.tmp}/logs"/-->
-            <sysproperty key="port" value="45678"/>
-            <sysproperty key="url" value="${jsunit.testrunner}?testPage=${tests.tmp}/AllTests.html"/>
-            <test name="net.jsunit.StandaloneTest" todir="${tests.logs}">
-            </test>
-        </junit>
-        <!-- 2.b Transforms test results into a CruiseControl understandable format -->
-        <!--
-        <xslt style="jsunit2cc-1.xsl"
-              basedir="${tests.tmp}/logs"
-              destdir="/opt/CruiseControl/logs/crypto-sha1/"
-              extension="xml">
-        </xslt>
-        -->
-        <!-- Fails if a test failed -->
-        <delete dir="${tests.tmp}"/>    <!-- removes the temp. dir / files -->
-        <fail message="An error or a failure occured during the automated tests.">
-            <condition>
-                <or>
-                    <isset property="jsunit.failed"/>
-                    <isset property="jsunit.error"/>
-                </or>
-            </condition>
-        </fail>
+        </jsunit>
+
     </target>
-    
-    <target name="package" depends="test, doc, compile, build-compressed" description="Takes the compiled code and package it in its distributable format, such as a JAR.">
-        <!-- A. Simply copies the library to the target dir (nothing more to do for the standard library) -->
-        <copy file="${src.dir}/sha1.js" tofile="${lib.dir}/sha1-${ivy.revision}.js" />
-        <!-- B. Creates the compressed version of the library -->
-        <java jar="${yuicompressor.jar}" fork="true" output="${lib.dir}/sha1-compressed-${ivy.revision}.js" failonerror="true">
-            <arg line="--type js" />
-            <arg file="${src.dir}/sha1.js"/>
-        </java>
+
+
+    <target name="package" depends="test, doc, build-default, build-compressed" description="Takes the compiled code and package it in its distributable format.">
     </target>
-    
+
+
     <target name="integration-test" depends="package" description="Processes and deploys the package if necessary into an environment where integration tests can be run.">
-        <!-- nothing to do -->
+
+        <!-- Testing the compressed version of the library -->
+
+        <!-- Replaces the tested library with the compressed version -->
+        <!-- FIXME : it's not clean : it should not override a file already in build.dir -->
+        <!--
+        <copy file="${target.dir}/${ant.project.name}-compressed-${ivy.revision}.js" tofile="${build.dir}/sha1.js"/>
+        -->
+
+        <!--
+        <resources id="jsunit.in.files">
+            <file file="${build.dir}/sha1.js"/>
+            <fileset dir="${tests.dir}"/>
+        </resources>
+        -->
+
+        <!--
+        <antcall target="jsunit">
+            <reference refid="jsunit.in.files"/>
+            <param name="jsunit.in.testsuite" value="AllTests.html"/>
+            <param name="jsunit.out.logs" value="${tests.logs}"/>
+        </antcall>
+        -->
+
     </target>
-    
+
+
     <target name="verify" depends="integration-test" description="Runs any checks to verify the package is valid and meets quality criteria.">
         <!-- nothing to do -->
     </target>
-    
+
+
     <target name="install" depends="verify" description="Installs the package into the local repository, for use as a dependency in other projects locally.">
         <ivy:publish resolver="local" artifactspattern="${lib.dir}/[artifact]-[revision].[ext]" overwrite="true" />
     </target>
-    
+
+
     <target name="deploy" depends="verify" description="Done in an integration or release environment, copies the final package to the remote repository for sharing with other developers and projects.">
         <!-- nothing to do -->
     </target>
-    
+
+
+    <target name="cruisecontrol" depends="verify" description="This target can be used to trigger a build useable with CruiseControl.">
+    </target>
+
 
     <!-- ==================== -->
-    <!-- Some more specific targets -->
+    <!-- Internal targets -->
     <!-- ==================== -->
 
-    <target name="doc" depends="validate" description="Generates developer documentation.">
+
+    <!-- Generates developer documentation. -->
+    <target name="doc" depends="validate">
         <!-- Generates a report of dependencies -->
         <ivy:report todir="${doc.dir}"/>
         <!-- Generates the API doc -->
@@ -134,25 +173,26 @@
         </exec>
     </target>
 
-    <target name="build-default" depends="validate" description="Builds the default package.">
-        <copy file="${src.dir}/sha1.js" tofile="${lib.dir}/sha1-${ivy.revision}.js" />
+
+    <!-- Builds the default package. -->
+    <target name="build-default" depends="validate">
+        <!-- Simply copies the library to the target dir (nothing more to do for the standard library) -->
+        <copy file="${src.dir}/sha1.js" tofile="${target.dir}/${ant.project.name}-${ivy.revision}.js" />
     </target>
 
-    <target name="build-compressed" depends="validate" description="Builds the compressed version of the package.">
+
+    <!-- Builds the compressed version of the package. -->
+    <target name="build-compressed" depends="validate">
+        <!-- Creates the compressed version of the library -->
+        <java jar="${yuicompressor.jar}" fork="true" output="${target.dir}/${ant.project.name}-compressed-${ivy.revision}.js" failonerror="true">
+            <arg line="--type js" />
+            <arg file="${src.dir}/sha1.js"/>
+        </java>
     </target>
 
-    <target name="clean" description="Cleans this project.">
-        <delete includeemptydirs="true" dir="${target.dir}"/>
-        <delete includeemptydirs="true" dir="${build.dir}"/>
-    </target>
-    
-    
+
     <!-- ==================== -->
     <!-- CruiseControl targets -->
     <!-- ==================== -->
-    
-    <target name="cruisecontrol-build" depends="verify">
-    </target>
-    
 
 </project>
