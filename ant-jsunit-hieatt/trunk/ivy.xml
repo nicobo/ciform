@@ -1,0 +1,20 @@
+<ivy-module version="2.0">
+    <info organisation="nicommons" module="ant-jsunit-hieatt" revision="1.0" status="integration">
+        <ivyauthor name="Nicolas BONARDELLE" url="http://nicobo.net/contact?subject=ant-jsunit-hieatt" />
+        <repository name="plugnauth@sourceforge" url="http://plugnauth.sourceforge.net/ivy" ivys="true" artifacts="true" />
+        <description homepage="http://plugnauth.sourceforge.net/ant-jsunit-hieatt">
+            An ant task for Edward Hieatt's JsUnit.
+        </description>
+    </info>
+    <publications>
+        <!-- The source script as plain text, including all inner informations and comments. -->
+        <artifact name="ant-jsunit-hieatt" type="javascript" ext="js" />
+        <!-- An obfuscated, size-reduced version of the script. Use to speed up loading time in final environment. -->
+        <artifact name="ant-jsunit-hieatt" type="javascript" ext="js" />
+    </publications>
+    <dependencies>
+        <!-- Ant : not yet implemented -->
+        <!-- JUnit : not yet implemented -->
+        <!-- JsUnit : not yet implemented -->
+    </dependencies>
+</ivy-module>

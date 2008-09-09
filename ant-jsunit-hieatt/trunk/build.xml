@@ -1,0 +1,108 @@
+<!--
+   Build script for the project "ant-jsunit-hieatt".
+
+   This script is an Ant script using Ivy extension to resolve dependencies.
+   You will need both Ant (http://ant.apache.org/) and Ivy (http://ant.apache.org/ivy) to use it.
+-->
+<project name="ant-jsunit-hieatt" default="verify" xmlns:ivy="antlib:org.apache.ivy.ant">
+
+
+    <!-- ==================== -->
+    <!-- Settings -->
+    <!-- ==================== -->
+
+    <!-- custom, user specific, properties -->
+    <property file="local.properties"/>
+    <!-- default properties -->
+    <property file="build.properties"/>
+
+
+    <!-- ==================== -->
+    <!-- Public targets : they are greatly inspired from the Maven build lifecycle -->
+    <!-- ==================== -->
+
+
+    <target name="clean" description="Restores the initial state of the project, deleting any generated file.">
+        <delete includeemptydirs="true" dir="${target.dir}"/>
+        <delete includeemptydirs="true" dir="${build.dir}"/>
+    </target>
+
+
+    <target name="validate" description="Validates the project is correct and all necessary information is available.">
+        <!-- Retreives dependencies with ivy -->
+        <ivy:retrieve/>
+        <!-- Creates necessary directories -->
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${target.dir}" />
+    </target>
+
+
+    <target name="compile" depends="validate" description="Compiles the source code of the project.">
+
+    	<javac srcdir="${src.dir}" destdir="${build.dir}" source="1.4">
+    		<src path="${src.dir}" />
+    		<src path="${tests.dir}" />
+    		<classpath>
+    			<fileset dir="${lib.dir}">
+	    			<include name="*.jar"/>
+    			</fileset>
+    		</classpath>
+    	</javac>
+
+        <dirset dir="/home/cbonar/src/jsunit/java/bin"/>
+        <dirset dir="${jsunit.dir}/java/config"/>
+
+    	<copy todir="${build.dir}">
+    		<fileset dir="${rc.dir}" />
+    	</copy>
+
+    </target>
+
+
+    <!-- NOTE : These tests should not require the code be packaged or deployed. -->
+    <target name="test" depends="compile" description="Tests the compiled source code using a suitable unit testing framework.">
+        <!-- nothing to do -->
+    </target>
+
+
+    <target name="package" depends="test, doc" description="Takes the compiled code and package it in its distributable format.">
+
+    	<jar destfile="${target.dir}/${ant.project.name}-${ivy.revision}.jar"
+    		basedir="${build.dir}">
+    	    <include name="**/*"/>
+    	</jar>
+
+    </target>
+
+
+    <target name="integration-test" depends="package" description="Processes and deploys the package if necessary into an environment where integration tests can be run.">
+        <!-- nothing to do -->
+    </target>
+
+
+    <target name="verify" depends="integration-test" description="Runs any checks to verify the package is valid and meets quality criteria.">
+        <!-- nothing to do -->
+    </target>
+
+
+    <target name="install" depends="verify" description="Installs the package into the local repository, for use as a dependency in other projects locally.">
+        <!-- nothing to do -->
+    </target>
+
+
+    <target name="deploy" depends="verify" description="Done in an integration or release environment, copies the final package to the remote repository for sharing with other developers and projects.">
+        <!-- nothing to do -->
+    </target>
+
+
+    <!-- ==================== -->
+    <!-- Internal targets -->
+    <!-- ==================== -->
+
+
+    <!-- Generates developer documentation. -->
+    <target name="doc" depends="validate">
+    </target>
+
+
+</project>
