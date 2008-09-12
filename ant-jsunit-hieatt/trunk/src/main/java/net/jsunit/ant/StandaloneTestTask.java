@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
-import net.jsunit.GeneratedStandaloneTest;
 import net.jsunit.StandaloneTest;
 import net.jsunit.configuration.ConfigurationProperty;
 
@@ -27,7 +26,7 @@ import org.apache.tools.ant.types.FileSet;
 
 
 /**
- * This task permits convenient access to the {@link GeneratedStandaloneTest}
+ * This task permits convenient access to the {@link StandaloneTest}
  * unit test.
  * 
  * @author http://nicobo.net/contact?subject=jsunit+ant
