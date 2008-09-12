@@ -1,9 +1,10 @@
 package net.jsunit;
 
 
+import java.util.Iterator;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import net.jsunit.StandaloneTest;
 import net.jsunit.configuration.Configuration;
 import net.jsunit.configuration.ConfigurationSource;
 import net.jsunit.configuration.DelegatingConfigurationSource;
@@ -49,8 +50,9 @@ public class GeneratedStandaloneTest extends StandaloneTest
 			TestSuite suite = new TestSuite();
 			ConfigurationSource originalSource = Configuration.resolveSource();
 			Configuration configuration = new Configuration( originalSource );
-			for ( final Browser browser : configuration.getBrowsers() )
+			for ( Iterator itb = configuration.getBrowsers().iterator(); itb.hasNext(); )
 			{
+				final Browser browser = (Browser) itb.next();
 				suite.addTest( new GeneratedStandaloneTest( new DelegatingConfigurationSource( originalSource ) {
 					public String browserFileNames()
 					{
