@@ -4,6 +4,8 @@ package net.jsunit.ant;
 import java.util.List;
 import java.util.Vector;
 
+import net.jsunit.TestPage;
+
 import org.apache.tools.ant.taskdefs.optional.junit.JUnitTest;
 import org.apache.tools.ant.types.FileSet;
 
@@ -46,7 +48,7 @@ public class JsUnitTestTask extends JUnitTest
 
 
 
-	public JsUnitTestTask( String name )
+	public JsUnitTestTask( String name, TestPage testPage )
 	{
 		super( name );
 	}

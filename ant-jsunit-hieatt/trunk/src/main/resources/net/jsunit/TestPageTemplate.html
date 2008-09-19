@@ -1,5 +1,12 @@
 <html>
 	<head>
+		<!--
+			This page was automatically generated to run a JsUnit test.
+			You can delete it safely one the test is finished.
+			If you have comments or feedbacks on this page,
+			please visit http://nicobo.net/contact?subject=jsunit+ant
+		-->
+
 		<title>Test Page for @project@</title>
 
 		<!-- JsUnit requirement -->
@@ -10,10 +17,12 @@
 
 		<!-- "Automagically" detects test functions -->
 		<script type="text/javascript">
+			// This function is specified in JsUnit's documentation.
 			function exposeTestFunctionNames()
 			{
 				var tests = new Array();
 				for ( var o in window ) {
+					// matches all functions which name starts with 'test'
 					if( o.match(/^test/) && typeof(window[o]) == "function" ) {
 						tests.push(o);
 					}
@@ -24,7 +33,7 @@
 	</head>
 	<body>
 		<!--
-			A minimal body to inform readers of the way to use this file.
+			A minimal body to inform potential readers of the way to use this file.
 		-->
 		<h1>Test Page for @project@</h1>
 		<p>
