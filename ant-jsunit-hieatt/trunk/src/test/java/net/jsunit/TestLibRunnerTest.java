@@ -9,18 +9,20 @@ import junit.textui.TestRunner;
 
 
 
-public class TestLibRunnerTest extends TestCase
+public class TestLibRunnerTest extends TestCase implements
+        TestLibRunnerParameters
 {
-	private String urlfail = getClass().getResource( "fail.js" ).toString();
-	private String urlSuccess1 = getClass().getResource( "success1.js" ).toString();
-	private String urlSuccess2 = getClass().getResource( "success2.js" ).toString();
+	private String urlfail;
+	private String urlSuccess1;
+	private String urlSuccess2;
 
 
 
 	protected void setUp() throws Exception
 	{
-		System.setProperty( TestLibRunnerConfigurationSource.PROP_PROJECT, getClass().getName() );
-		// TODO ...
+		System.setProperty( PROP_PROJECT, getClass().getName() );
+		System.setProperty( PROP_TESTRUNNER, new File( "/../lib/jsunit/testRunner.html" ).toURI().toString() );
+		System.setProperty( PROP_COREJS, new File( "/../lib/jsunit/app/jsUnitCore.js" ).toURI().toString() );
 		urlfail = getClass().getResource( "fail.js" ).toString();
 		urlSuccess1 = getClass().getResource( "success1.js" ).toString();
 		urlSuccess2 = getClass().getResource( "success2.js" ).toString();
@@ -34,26 +36,26 @@ public class TestLibRunnerTest extends TestCase
 		System.setProperty( TestLibRunnerConfigurationSource.PARAM_TESTPAGE, urlfail );
 		TestLibRunner test = new TestLibRunner( new TestLibRunnerConfigurationSource() );
 		TestResult result = TestRunner.run( test );
-		assert (result.failureCount() > 0 && result.errorCount() == 0);
+		assertTrue( result.failureCount() > 0 && result.errorCount() == 0 );
 
 		// succeeds if the test succeeds
 		System.setProperty( TestLibRunnerConfigurationSource.PARAM_TESTPAGE, urlSuccess1 );
 		test = new TestLibRunner( new TestLibRunnerConfigurationSource() );
 		result = TestRunner.run( test );
-		assert (result.failureCount() == 0 && result.errorCount() == 0);
+		assertTrue( result.failureCount() == 0 && result.errorCount() == 0 );
 
 		// fails if at least one test fails
 		System.setProperty( TestLibRunnerConfigurationSource.PARAM_TESTPAGE, urlfail
 		        + File.pathSeparator + urlSuccess1 );
 		test = new TestLibRunner( new TestLibRunnerConfigurationSource() );
 		result = TestRunner.run( test );
-		assert (result.failureCount() > 0 && result.errorCount() == 0);
+		assertTrue( result.failureCount() > 0 && result.errorCount() == 0 );
 
 		// succeeds if no test fails
 		System.setProperty( TestLibRunnerConfigurationSource.PARAM_TESTPAGE, urlSuccess1
 		        + File.pathSeparator + urlSuccess2 );
 		test = new TestLibRunner( new TestLibRunnerConfigurationSource() );
 		result = TestRunner.run( test );
-		assert (result.failureCount() == 0 && result.errorCount() == 0);
+		assertTrue( result.failureCount() == 0 && result.errorCount() == 0 );
 	}
 }

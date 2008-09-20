@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Iterator;
@@ -15,7 +14,7 @@ import java.util.MissingResourceException;
 
 
 /**
- * This utility class helps building JsUnit (HTML) test pages, giving a list of files to include.
+ * This utility class helps building JsUnit (HTML) test pages, provided a list of files to include.
  * 
  * @author http://nicobo.net/contact?subject=jsunit+ant
  */
@@ -148,10 +147,10 @@ public class TestPage
 
 		// Other includes : currently only Javascript is supported
 		StringBuffer includesBuffer = new StringBuffer();
-		Collection javascripts = (Collection) includes.get( INCLUDE_JAVASCRIPT );
+		Collection javascripts = (Collection) getIncludes().get( INCLUDE_JAVASCRIPT );
 		for ( Iterator itj = javascripts.iterator(); itj.hasNext(); )
 		{
-			URI javascript = (URI) itj.next();
+			String javascript = (String) itj.next();
 			includesBuffer.append( "<script type=\"text/javascript\" src=\"" );
 			includesBuffer.append( javascript/*new File( javascripts[i] ).toURI()*/);
 			includesBuffer.append( "\"></script>\n" );

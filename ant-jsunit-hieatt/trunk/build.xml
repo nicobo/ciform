@@ -42,8 +42,10 @@
     <target name="compile" depends="validate" description="Compiles the source code of the project.">
 
     	<javac srcdir="${src.dir}" destdir="${classes.dir}" source="1.4">
-    		<src path="${src.dir}" />
-    		<src path="${tests.dir}" />
+    		<src path="${src.dir}/java" />
+    		<src path="${src.dir}/resources" />
+    		<src path="${tests.dir}/java" />
+    		<src path="${tests.dir}/javascript" />
     		<classpath>
     			<fileset dir="${lib.dir}">
 	    			<include name="*.jar"/>
@@ -53,10 +55,6 @@
 
         <dirset dir="/home/cbonar/src/jsunit/java/bin"/>
         <dirset dir="${jsunit.dir}/java/config"/>
-
-    	<copy todir="${classes.dir}">
-    		<fileset dir="${rc.dir}" />
-    	</copy>
 
     </target>
 

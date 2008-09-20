@@ -26,6 +26,7 @@ import net.jsunit.model.Browser;
  */
 public class TestLibRunner extends StandaloneTest
 {
+
 	private TestLibRunnerConfigurationSource configurationSource;
 
 
