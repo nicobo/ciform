@@ -5,24 +5,44 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.MissingResourceException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import net.jsunit.utility.SourcePathUtil;
+
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 
 
 /**
- * This utility class helps building JsUnit (HTML) test pages, provided a list of files to include.
+ * <p>This utility class helps building JsUnit (HTML) test pages, provided a list of files to include.</p>
  * 
+ * <p>TODO : allow the inclusion of distant files, not only local ones</p>
  * @author http://nicobo.net/contact?subject=jsunit+ant
  */
 public class TestPage
 {
 	/**
 	 * Key to use to include Javascript tags in the page.<br/>
-	 * The corresponding value for this key in the {@link Map} must be a {@link Collection}&lt;String&gt; containing
+	 * The corresponding value for this key in the {@link Map} must be a {@link Collection}&lt;{@link URI}&gt; containing
 	 * all the <tt>src</tt> attributes of the corresponding &lt;script/&gt; tags.
 	 * @see #setIncludes(Map)
 	 */
@@ -112,13 +132,56 @@ public class TestPage
 	//
 
 	/**
+	 * This method is to make sure we only include well-formed elements in the HTML page (since
+	 * the resources to include are coming from outside, we cannot say if they're correctly formated or not).
+	 * @see http://www.javazoom.net/services/newsletter/xmlgeneration.html
+	 */
+	private String buildJavascriptTag( String src ) throws URISyntaxException,
+	        UnsupportedOperationException
+	{
+		try
+		{
+			DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder domBuilder = domFactory.newDocumentBuilder();
+			DOMImplementation dom = domBuilder.getDOMImplementation();
+			Document xmlDoc = dom.createDocument( null, null, null );
+			Element tag = xmlDoc.createElement( "script" );
+			tag.setAttribute( "type", "text/javascript" );
+			tag.setAttribute( "src", SourcePathUtil.normalizePath( src ).toASCIIString() );
+
+			TransformerFactory tf = TransformerFactory.newInstance();
+			Transformer serializer = tf.newTransformer();
+			serializer.setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, "yes" );
+			serializer.setOutputProperty( OutputKeys.ENCODING, "UTF-8" );
+			StringWriter sw = new StringWriter();
+			serializer.transform( new DOMSource( tag ), new StreamResult( sw ) );
+
+			return sw.toString();
+		}
+		catch ( ParserConfigurationException pce )
+		{
+			throw new UnsupportedOperationException( pce );
+		}
+		catch ( TransformerConfigurationException tce )
+		{
+			throw new UnsupportedOperationException( tce );
+		}
+		catch ( TransformerException te )
+		{
+			throw new UnsupportedOperationException( te );
+		}
+	}
+
+
+
+	/**
 	 * <p>Builds complete JsUnit test suite page from the current environment.</p>
 	 * 
 	 * <p>Make sure all required properties are set and have a correct value before calling this method (see the arguments in {@link #TestPage(String, String, Map)}).</p>
 	 * 
 	 * @return The content of the generated test page
 	 */
-	public String asString()
+	public String asString() throws URISyntaxException
 	{
 		// Reads the template of the test suite page to generate into a local buffer
 		InputStream is = getClass().getResourceAsStream( TEMPLATE_FILENAME );
@@ -147,14 +210,14 @@ public class TestPage
 
 		// Other includes : currently only Javascript is supported
 		StringBuffer includesBuffer = new StringBuffer();
+
 		Collection javascripts = (Collection) getIncludes().get( INCLUDE_JAVASCRIPT );
 		for ( Iterator itj = javascripts.iterator(); itj.hasNext(); )
 		{
-			String javascript = (String) itj.next();
-			includesBuffer.append( "<script type=\"text/javascript\" src=\"" );
-			includesBuffer.append( javascript/*new File( javascripts[i] ).toURI()*/);
-			includesBuffer.append( "\"></script>\n" );
+			URI javascript = (URI) itj.next();
+			includesBuffer.append( buildJavascriptTag( javascript.toASCIIString() ) );
 		}
+
 		out = out.replace( TEMPLATE_TAG_INCLUDES, includesBuffer.toString() );
 
 		return out;
@@ -169,7 +232,7 @@ public class TestPage
 	 * @return the file (so one can chain operations on it)
 	 * @throws IOException If an open/write/close operation failed on the given file
 	 */
-	public File writeTo( File file ) throws IOException
+	public File writeTo( File file ) throws IOException, URISyntaxException
 	{
 		FileWriter fw = new FileWriter( file );
 		fw.write( asString() );
@@ -187,45 +250,18 @@ public class TestPage
 	 * @throws IOException In case the temporary file failed to be created
 	 * @see #writeTo(File)
 	 */
-	public File writeToFile( String filename ) throws IOException
+	public File writeToFile( String filename ) throws IOException,
+	        URISyntaxException
 	{
-		File file = filename != null ? new File( filename ) : File.createTempFile( "jsunit-", ".tmp" );
+		File file = filename != null ? new File( filename ) : File.createTempFile( "tmp-jsunit-", ".html" );
 		return writeTo( file );
 	}
 
 
 
-	public File writeToFile() throws IOException
+	public File writeToFile() throws IOException, URISyntaxException
 	{
 		return writeToFile( null );
 	}
-
-	//	/** The best effort to get a well formed URI */
-	//	private static URI asURI( String text ) throws URISyntaxException
-	//	{
-	//		try
-	//		{
-	//			return new URL( text ).toURI();
-	//		}
-	//		catch ( MalformedURLException murle )
-	//		{
-	//			return new File( text ).toURI();
-	//		}
-	//	}
-	//
-	//
-	//
-	//	/**
-	//	 * <p>Builds the URL to pass to {@link Configuration#setTestURL(URL)}</p>
-	//	 * 
-	//	 * @throws IllegalStateException if a property is missing or is incorrect
-	//	 */
-	//	private String asURL( String testRunner, File testPage )
-	//	        throws URISyntaxException, IOException
-	//	{
-	//		URI uri = asURI( testRunner );
-	//		return new URI( uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), "testPage="
-	//		        + testPage.getPath(), uri.getFragment() ).toString();
-	//	}
 
 }

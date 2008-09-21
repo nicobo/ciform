@@ -1,10 +1,14 @@
 <!--
-   Build script for the project "ant-jsunit-hieatt".
+    Build script for the project "ant-jsunit-hieatt".
 
-   This script is an Ant script using Ivy extension to resolve dependencies.
-   You will need both Ant (http://ant.apache.org/) and Ivy (http://ant.apache.org/ivy) to use it.
+    This script is an Ant script using Ivy extension to resolve dependencies.
+    You will need both Ant (http://ant.apache.org/) and Ivy (http://ant.apache.org/ivy) to use it.
+
+	TODO ? organise build files in /tests/, /bin/, ... so we can package easily ?
 -->
-<project name="ant-jsunit-hieatt" default="verify" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="ant-jsunit-hieatt" default="verify"
+	xmlns:ivy="antlib:org.apache.ivy.ant"
+	xmlns:rsel="antlib:org.apache.tools.ant.types.resources.selectors">
 
 
     <!-- ==================== -->
@@ -15,6 +19,37 @@
     <property file="local.properties"/>
     <!-- default properties -->
     <property file="build.properties"/>
+
+	<!-- Source path : sources and resources -->
+    <path id="srcpath">
+    	<dirset dir="${src.dir}">
+    	  <include name="java"/>
+    	  <include name="resources"/>
+    	</dirset>
+    	<dirset dir="${tests.dir}">
+    	  <include name="java"/>
+    	  <include name="javascript"/>
+    	</dirset>
+    </path>
+
+
+	<!-- Resources only -->
+    <path id="rc.files">
+    	<fileset dir="${src.dir}/java" excludes="**/*.java"/>
+       	<fileset dir="${src.dir}/resources" excludes="**/*.java"/>
+       	<fileset dir="${tests.dir}/java" excludes="**/*.java"/>
+       	<fileset dir="${tests.dir}/javascript" excludes="**/*.java"/>
+    </path>
+
+
+	<!-- Classpath for Java operations -->
+	<path id="lib.files">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar"/>
+			<exclude name="jsunit/java/lib/ant.jar"/>
+			<exclude name="jsunit/java/lib/junit.jar"/>
+		</fileset>
+	</path>
 
 
     <!-- ==================== -->
@@ -41,20 +76,14 @@
 
     <target name="compile" depends="validate" description="Compiles the source code of the project.">
 
-    	<javac srcdir="${src.dir}" destdir="${classes.dir}" source="1.4">
-    		<src path="${src.dir}/java" />
-    		<src path="${src.dir}/resources" />
-    		<src path="${tests.dir}/java" />
-    		<src path="${tests.dir}/javascript" />
-    		<classpath>
-    			<fileset dir="${lib.dir}">
-	    			<include name="*.jar"/>
-    			</fileset>
-    		</classpath>
+    	<javac destdir="${classes.dir}" classpathref="lib.files" source="1.4" debug="true">
+    		<src refid="srcpath" />
     	</javac>
 
-        <dirset dir="/home/cbonar/src/jsunit/java/bin"/>
-        <dirset dir="${jsunit.dir}/java/config"/>
+    	<!-- Copies all remaining files (= all files under the source tree, except Java sources) to the build dir. -->
+    	<copy todir="${classes.dir}">
+    		<path refid="rc.files"/>
+    	</copy>
 
     </target>
 
@@ -62,10 +91,25 @@
     <!-- NOTE : These tests should not require the code be packaged or deployed. -->
     <target name="test" depends="compile" description="Tests the compiled source code using a suitable unit testing framework.">
 
-        <junit fork="true">
-            <test name="java.net.jsunit.GeneratedStandaloneTestTest" todir="${tests.logs}">
+        <junit fork="false" haltonerror="true" haltonfailure="true">
+
+        	<sysproperty key="jsunit.testRunner" value="${jsunit.testRunner}" />
+        	<sysproperty key="jsunit.coreJs" value="${jsunit.coreJs}" />
+            <sysproperty key="logsDirectory" value="${tests.logs}" />
+            <sysproperty key="browserFileNames" value="${jsunit.browsers}" />
+
+        	<classpath>
+            	<path refid="lib.files" />
+        		<pathelement path="${classes.dir}"/>
+               	<!-- TODO : make the following a parameter -->
+                <dirset dir="${jsunit.dir}/java/config"/>
+        	</classpath>
+
+            <test name="net.jsunit.TestLibRunnerTest" todir="${tests.logs}">
+                <formatter type="brief" usefile="false" />
                 <formatter type="xml" />
             </test>
+
         </junit>
 
     </target>

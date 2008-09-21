@@ -3,12 +3,8 @@ package net.jsunit;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -16,6 +12,7 @@ import net.jsunit.configuration.Configuration;
 import net.jsunit.configuration.ConfigurationProperty;
 import net.jsunit.configuration.ConfigurationSource;
 import net.jsunit.configuration.DelegatingConfigurationSource;
+import net.jsunit.utility.SourcePathUtil;
 
 
 
@@ -59,7 +56,7 @@ public class TestLibRunnerConfigurationSource extends
 	{
 		if ( testPage == null || !testPage.exists() )
 		{
-			testPage = buildTestPage().writeToFile(); // throw URI, IO
+			testPage = buildTestPage().writeToFile(); // throw URIx, IOx
 		}
 		return testPage;
 	}
@@ -73,36 +70,24 @@ public class TestLibRunnerConfigurationSource extends
 
 
 
-	public String getTestRunner() throws URISyntaxException, IOException
+	public URI getTestRunner() throws URISyntaxException, IOException
 	{
 		return getRequiredURISystemProperty( PROP_TESTRUNNER );
 	}
 
 
 
-	/** The best effort to get a well formed URI */
-	protected static URI getURI( String text ) throws URISyntaxException
-	{
-		try
-		{
-			return new URL( text ).toURI();
-		}
-		catch ( MalformedURLException murle )
-		{
-			return new File( text ).toURI();
-		}
-	}
-
-
-
 	/**
+	 * Simply throw an exception id the property is not found (helps
+	 * keeping the code clear).
+	 * 
 	 * @param key
 	 *            the name of the property to retrieve
 	 * @return A well formed URI based on the value of the given property
 	 * @throws IllegalArgumentException
 	 *             if the given property doesn't exist.
 	 */
-	protected static String getRequiredURISystemProperty( String key )
+	protected static URI getRequiredURISystemProperty( String key )
 	        throws URISyntaxException
 	{
 		String val = System.getProperty( key );
@@ -113,7 +98,7 @@ public class TestLibRunnerConfigurationSource extends
 			throw new IllegalArgumentException( "Missing property : " + key );
 		}
 
-		return getURI( val ).toString();
+		return SourcePathUtil.normalizePath( val );
 	}
 
 
@@ -128,10 +113,10 @@ public class TestLibRunnerConfigurationSource extends
 	{
 		// a. Gathers parameters from the System
 		String project = System.getProperty( PROP_PROJECT, "Unknown project" );
-		String jsUnitCore = getRequiredURISystemProperty( PROP_COREJS );
-		Collection javascripts = Arrays.asList( System.getProperty( PROP_JAVASCRIPTS, "" ).split( File.pathSeparator ) );
+		String jsUnitCore = getRequiredURISystemProperty( PROP_COREJS ).toASCIIString();
+		String javascripts = System.getProperty( PROP_JAVASCRIPTS, "" );
 		Map includes = new Hashtable();
-		includes.put( TestPage.INCLUDE_JAVASCRIPT, javascripts );
+		includes.put( TestPage.INCLUDE_JAVASCRIPT, SourcePathUtil.sourcePathToURI( javascripts ) );
 
 		// b. Builds the test page from the parameters
 		return new TestPage( project, jsUnitCore, includes );
@@ -148,20 +133,21 @@ public class TestLibRunnerConfigurationSource extends
 	 * 
 	 * <p>Before calling this method, make sure {@link #setTestSuitePage(File)} has been correctly set.</p>
 	 * 
-	 * <p>NOTE : This is a bit weird because the test page's file is created in this method,
-	 * but must be deleted by the unit test once done. This is because I had to hack into this class
-	 * to reuse the maximum of existing code (in order to limit the risks of broken code with the future versions).</p>
+	 * <p>NOTE : This is a bit weird because the test page's file is created in this method (through a call to {@link #getTestPage()}),
+	 * but must be deleted from "outside" by the calling unit test once done. This is because I had to hack into this class
+	 * to reuse a maximum of existing code (in order to limit the risks of broken code with the future versions).</p>
 	 * 
 	 * @return The full URL to use with JsUnit (the existing property : {@value ConfigurationProperty#URL} is ignored)
 	 * @throws IllegalArgumentException if a property is missing or is incorrect
-	 * FIXME don't create the test page here
+	 * FIXME ? don't create the test page here ?
 	 */
 	public String url()
 	{
 		try
 		{
-			return getTestRunner() + "?" + PARAM_TESTPAGE + "="
-			        + getTestPage().getCanonicalPath();
+			URI tr = getTestRunner();
+			return new URI( tr.getScheme(), tr.getUserInfo(), tr.getHost(), tr.getPort(), tr.getPath(), PARAM_TESTPAGE
+			        + "=" + getTestPage().getCanonicalPath(), tr.getFragment() ).toASCIIString();
 		}
 		catch ( URISyntaxException urise )
 		{

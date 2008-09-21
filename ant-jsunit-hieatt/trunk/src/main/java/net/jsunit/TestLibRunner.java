@@ -77,7 +77,7 @@ public class TestLibRunner extends StandaloneTest
 			final Browser browser = (Browser) itb.next();
 
 			// the configuration source is adjusted to only return the current browser
-			// TODO write the test page only once (then delete it after all tests have been executed)
+			// TODO ? write the test page only once (then delete it after all tests have been executed) ?
 			suite.addTest( new TestLibRunner( new TestLibRunnerConfigurationSource( originalSource ) {
 				public String browserFileNames()
 				{
