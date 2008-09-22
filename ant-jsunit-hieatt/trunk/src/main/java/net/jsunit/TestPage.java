@@ -136,8 +136,8 @@ public class TestPage
 	 * the resources to include are coming from outside, we cannot say if they're correctly formated or not).
 	 * @see http://www.javazoom.net/services/newsletter/xmlgeneration.html
 	 */
-	private String buildJavascriptTag( String src ) throws URISyntaxException,
-	        UnsupportedOperationException
+	private static String buildJavascriptTag( String src )
+	        throws URISyntaxException, UnsupportedOperationException
 	{
 		try
 		{
