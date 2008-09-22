@@ -10,7 +10,6 @@
 	xmlns:ivy="antlib:org.apache.ivy.ant"
 	xmlns:rsel="antlib:org.apache.tools.ant.types.resources.selectors">
 
-
     <!-- ==================== -->
     <!-- Settings -->
     <!-- ==================== -->
@@ -28,19 +27,17 @@
     	</dirset>
     	<dirset dir="${tests.dir}">
     	  <include name="java"/>
-    	  <include name="javascript"/>
+    	  <include name="resources"/>
     	</dirset>
     </path>
-
 
 	<!-- Resources only -->
     <path id="rc.files">
     	<fileset dir="${src.dir}/java" excludes="**/*.java"/>
-       	<fileset dir="${src.dir}/resources" excludes="**/*.java"/>
+       	<fileset dir="${src.dir}/resources"/>
        	<fileset dir="${tests.dir}/java" excludes="**/*.java"/>
-       	<fileset dir="${tests.dir}/javascript" excludes="**/*.java"/>
+       	<fileset dir="${tests.dir}/resources"/>
     </path>
-
 
 	<!-- Classpath for Java operations -->
 	<path id="lib.files">
@@ -50,6 +47,23 @@
 			<exclude name="jsunit/java/lib/junit.jar"/>
 		</fileset>
 	</path>
+
+    <!--
+        Runs JsUnit tests. This target saves a lot of verbosity in the projects' build scripts.
+
+        Firefox 3 users : change the security.fileuri.strict_origin_policy parameter to 'false' for the following target to work
+
+        // static configuration
+        @in jsunit.dir          the directory where JsUnit resides
+        @in jsunit.coreJs       the jsUnitCore.js file
+        @in jsunit.testRunner   the test runner's HTML page
+    -->
+    <taskdef name="jsunit" classname="net.jsunit.ant.JsUnitTask" classpathref="lib.files">
+		<classpath>
+        	<path refid="lib.files" />
+    		<pathelement path="${classes.dir}"/>
+		</classpath>
+    </taskdef>
 
 
     <!-- ==================== -->
@@ -91,19 +105,22 @@
     <!-- NOTE : These tests should not require the code be packaged or deployed. -->
     <target name="test" depends="compile" description="Tests the compiled source code using a suitable unit testing framework.">
 
-        <junit fork="false" haltonerror="true" haltonfailure="true">
+    	<path id="testspath">
+        	<path refid="lib.files" />
+    		<pathelement path="${classes.dir}"/>
+           	<!-- TODO : make the following a parameter -->
+            <dirset dir="${jsunit.dir}/java/config"/>
+    	</path>
+
+    	<!-- Unit tests for TestLibRunner -->
+        <junit fork="true" haltonerror="true" haltonfailure="true">
 
         	<sysproperty key="jsunit.testRunner" value="${jsunit.testRunner}" />
         	<sysproperty key="jsunit.coreJs" value="${jsunit.coreJs}" />
             <sysproperty key="logsDirectory" value="${tests.logs}" />
             <sysproperty key="browserFileNames" value="${jsunit.browsers}" />
 
-        	<classpath>
-            	<path refid="lib.files" />
-        		<pathelement path="${classes.dir}"/>
-               	<!-- TODO : make the following a parameter -->
-                <dirset dir="${jsunit.dir}/java/config"/>
-        	</classpath>
+        	<classpath refid="testspath"/>
 
             <test name="net.jsunit.TestLibRunnerTest" todir="${tests.logs}">
                 <formatter type="brief" usefile="false" />
@@ -111,6 +128,43 @@
             </test>
 
         </junit>
+
+    	<!-- Unit test for the jsunit task itself : given an HTML test page -->
+        <jsunit showoutput="true"
+                printsummary="true"
+                filtertrace="false"
+                jsUnitRoot="${jsunit.dir}"
+                haltonfailure="true"
+                haltonerror="true"
+        		testPage="${tests.dir}/resources/SuccessTest1.html"
+                >
+
+            <sysproperty key="browserFileNames" value="${jsunit.browsers}"/>
+            <sysproperty key="logsDirectory" value="${tests.logs}"/>
+
+        	<classpath refid="testspath"/>
+
+        </jsunit>
+
+    	<!-- Unit test for the jsunit task itself : given Javascript libraries -->
+        <jsunit showoutput="true"
+                printsummary="true"
+                filtertrace="false"
+                jsUnitRoot="${jsunit.dir}"
+                haltonfailure="true"
+                haltonerror="true"
+        		fork="false"
+                >
+
+            <sysproperty key="browserFileNames" value="${jsunit.browsers}"/>
+            <sysproperty key="logsDirectory" value="${tests.logs}"/>
+
+            <fileset file="${tests.dir}/resources/success1.js"/>
+            <fileset file="${tests.dir}/resources/success2.js"/>
+
+        	<classpath refid="testspath"/>
+
+        </jsunit>
 
     </target>
 
