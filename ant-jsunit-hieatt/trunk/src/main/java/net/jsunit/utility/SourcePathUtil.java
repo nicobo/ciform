@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -56,7 +57,7 @@ public class SourcePathUtil
 	 * Creates a source path from a list of strings (which are supposedly file names).
 	 * Takes care of the special cases where the separator would be inside file names too.
 	 */
-	public static String filenamesToSourcePath( List pathElements,
+	public static String filenamesToSourcePath( Collection pathElements,
 	        String separator )
 	{
 		StringBuffer buffer = new StringBuffer();
@@ -77,9 +78,9 @@ public class SourcePathUtil
 
 	/**
 	 * Uses {@link File#pathSeparator} as the separator
-	 * @see #filenamesToSourcePath(List, String)
+	 * @see #filenamesToSourcePath(Collection, String)
 	 */
-	public static String filenamesToSourcePath( List pathElements )
+	public static String filenamesToSourcePath( Collection pathElements )
 	{
 		return filenamesToSourcePath( pathElements, File.pathSeparator );
 	}
