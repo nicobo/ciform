@@ -1,0 +1,21 @@
+<ivy-module version="2.0">
+    <info organisation="crypto" module="hex" revision="1.0.0" status="integration">
+        <ivyauthor name="Nicolas BONARDELLE" url="http://nicobo.net/contact?subject=crypto+hex+ivy"/>
+        <description homepage="http://code.google.com/p/ciform">
+            This library provides conversion functions from/to hexadecimal format.
+        </description>
+    </info>
+    <configurations>
+      <!-- The source script as plain text, including all inner informations and comments. -->
+      <conf name="source"/>
+      <!-- An obfuscated, size-reduced version of the script. Use to speed up loading time in final environment. -->
+      <conf name="minified"/>
+    </configurations>
+    <publications>
+        <artifact name="hex" type="js" conf="source"/>
+        <artifact name="hex-min" type="js" conf="minified"/>
+    </publications>
+    <dependencies>
+        <!-- no dependency required -->
+    </dependencies>
+</ivy-module>

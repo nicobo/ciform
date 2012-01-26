@@ -1,3 +1,13 @@
+//
+// NOTE : The original code is wrapped so that the defined functions don't collide with existing ones.
+// See http://michaux.ca/articles/javascript-namespacing.
+//
+Crypto_Hex = (function() {
+
+//
+// START OF ORIGINAL CODE
+//
+
 
 /*
  * conversion functions:
@@ -74,3 +84,15 @@ function hex2s(hex)
   return r;
 }
 
+//
+// END OF ORIGINAL CODE
+//
+
+return {
+    s2b: s2b,
+    b2s: b2s,
+    s2hex: s2hex,
+    hex2s: hex2s
+};
+
+})();

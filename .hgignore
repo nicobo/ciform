@@ -5,3 +5,5 @@ codecs/rsa/target
 codecs/rsa/.project
 tools/yuicompressor-*.jar
 tools/ivy-*.jar
+codecs/hex/local.properties
+codecs/hex/target
