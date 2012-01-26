@@ -1,2 +1,3 @@
 syntax: glob
 ciform/trunk/crypto/rsa/local.properties
+codecs/rsa/local.properties
