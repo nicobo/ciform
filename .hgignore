@@ -1,3 +1,7 @@
 syntax: glob
 ciform/trunk/crypto/rsa/local.properties
 codecs/rsa/local.properties
+codecs/rsa/target
+codecs/rsa/.project
+tools/yuicompressor-*.jar
+tools/ivy-*.jar

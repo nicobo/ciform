@@ -16,44 +16,61 @@
 
 
     <!-- ==================== -->
+    <!-- Third party tasks -->
+    <!-- ==================== -->
+
+    <path id="ivy.lib.path">
+        <fileset file="${ant.ivytask.path}" />
+    </path>
+    <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+
+
+    <!-- ==================== -->
     <!-- Main targets : they are greatly inspired from the Maven build lifecycle -->
     <!-- ==================== -->
 
     <target name="validate" description="Validates the project is correct and all necessary information is available.">
-        <!-- Retreives dependencies with ivy -->
-        <ivy:retrieve/>
-        <!-- Creates necessary directories -->
+        <!-- Retrieves dependencies with ivy : required to initialize the cache and to get informations about the module being built -->
+    	<ivy:retrieve />
+        <!-- Creates required directories -->
         <mkdir dir="${target.dir}" />
     </target>
-    
+
     <target name="compile" depends="validate" description="Compiles the source code of the project.">
-        <!-- nothing to do -->
-    </target>
-    
-    <target name="test" depends="compile" description="Tests the compiled source code using a suitable unit testing framework. These tests should not require the code be packaged or deployed.">
-        <!-- nothing to do -->
-    </target>
-    
-    <target name="package" depends="test, doc, build-default, build-min" description="Takes the compiled code and package it in its distributable format, such as a JAR.">
         <!-- nothing more to do -->
     </target>
-    
+
+    <target name="test" depends="compile" description="Tests the compiled source code using a suitable unit testing framework. These tests should not require the code be packaged or deployed.">
+        <!-- nothing more to do -->
+    </target>
+
+    <target name="package" depends="build-src, build-min, test, doc" description="Takes the compiled code and package it in its distributable format, such as a JAR.">
+        <!-- nothing more to do -->
+    </target>
+
     <target name="integration-test" depends="package" description="Processes and deploys the package if necessary into an environment where integration tests can be run.">
-        <!-- nothing to do -->
+        <!-- nothing more to do -->
     </target>
-    
+
     <target name="verify" depends="integration-test" description="Runs any checks to verify the package is valid and meets quality criteria.">
-        <!-- nothing to do -->
+        <!-- nothing more to do -->
     </target>
-    
+
     <target name="install" depends="verify" description="Installs the package into the local repository, for use as a dependency in other projects locally.">
-        <ivy:publish resolver="local" artifactspattern="${lib.dir}/[artifact]-[revision].[ext]" overwrite="true" />
+        <!-- 'local' resolver is a default one bundled with Ivy -->
+        <!-- 'artifactspattern' must match the name of the files this script builds -->
+        <ivy:publish resolver="local" srcivypattern="ivy.xml" artifactspattern="${lib.dir}/[artifact]-[revision].[ext]" overwrite="true" forcedeliver="true" />
+        <!--<echo message="Published to default local Ivy repository." />-->
     </target>
-    
+
     <target name="deploy" depends="verify" description="Done in an integration or release environment, copies the final package to the remote repository for sharing with other developers and projects.">
-        <!-- nothing to do -->
+        <!-- nothing more to do -->
     </target>
-    
+
+    <target name="clean" description="Cleans this project.">
+        <delete includeemptydirs="true" dir="${target.dir}"/>
+    </target>
+
 
     <!-- ==================== -->
     <!-- Some more specific targets -->
@@ -61,31 +78,30 @@
 
     <target name="doc" depends="validate" description="Generates developer documentation.">
         <!-- Generates a report of dependencies -->
-        <ivy:report todir="${doc.dir}"/>
+        <ivy:report todir="${doc.dir}/ivy"/>
         <!-- Generates the API doc -->
         <exec command="${jsdoc}" failonerror="true">
-            <arg value="-d"/> <arg value="${doc.dir}"/>
+            <arg value="-d"/> <arg value="${doc.dir}/api"/>
             <arg value="--no-lexical-privates"/>
             <arg value="--package-naming"/>
             <arg value="--nested-file-naming"/>
             <arg line="--project-name Crypto.RSA"/>
             <arg value="${src.dir}"/>
         </exec>
+        <echo message="Done generating doc." />
     </target>
 
-    <target name="build-default" depends="validate" description="Builds the default package.">
+    <target name="build-src" depends="validate" description="Builds the default .js.">
         <copy file="${src.dir}/rsa.js" tofile="${lib.dir}/rsa-${ivy.revision}.js" />
+        <echo message="Copied : ${lib.dir}/rsa-${ivy.revision}.js" />
     </target>
 
-    <target name="build-min" depends="validate" description="Builds the minified version of the package.">
-        <java jar="${yuicompressor.jar}" fork="true" output="${lib.dir}/rsa-${target.conf.min}-${ivy.revision}.js" failonerror="true">
+    <target name="build-min" depends="validate" description="Builds a minified version of the .js.">
+        <java jar="${yuicompressor.jar}" fork="true" output="${lib.dir}/rsa-min-${ivy.revision}.js" failonerror="true">
             <arg line="--type js" />
             <arg file="${src.dir}/rsa.js"/>
         </java>
-    </target>
-
-    <target name="clean" description="Cleans this project.">
-        <delete includeemptydirs="true" dir="${target.dir}"/>
+        <echo message="Minified : ${lib.dir}/rsa-min-${ivy.revision}.js" />
     </target>
 
 </project>
