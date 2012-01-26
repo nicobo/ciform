@@ -1,3 +1,12 @@
+//
+// NOTE : The original code is wrapped so that the defined functions don't collide with existing ones.
+// See http://michaux.ca/articles/javascript-namespacing.
+//
+Crypto_RSA = (function() {
+
+//
+// START OF ORIGINAL CODE
+//
 
 /* RSA public key encryption/decryption
  * The following functions are (c) 2000 by John M Hanna and are
@@ -392,3 +401,13 @@ function b2mpi(b)
  return rr;
 }
 
+//
+// END OF ORIGINAL CODE
+//
+
+return {
+ encrypt: RSAencrypt,
+ decrypt: RSAdecrypt
+};
+
+})();

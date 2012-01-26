@@ -1,0 +1,26 @@
+<ivy-module version="2.0">
+    <info organisation="crypto" module="rsa" revision="1.0" status="integration">
+        <license name="Copyright 2000 by John M Hanna" url="http://sourceforge.net/projects/shop-js" />
+        <license name="GNU General Public License (GPL)" url="http://www.gnu.org/copyleft/gpl.html" />
+        <ivyauthor name="Nicolas BONARDELLE" url="http://nicobo.net/contact?subject=crypto+rsa+ivy" />
+        <repository name="nicobo.net" url="http://code.google.com/p/ciform/files" ivys="true" artifacts="true" />
+        <description homepage="http://code.google.com/p/ciform">
+            This library provides a Javascript implementation of the RSA cipher.
+        </description>
+    </info>
+    <configurations>
+      <conf name="src"/>
+      <conf name="min"/>
+    </configurations>
+    <publications>
+        <artifact name="rsa" type="javascript" ext="js">
+            <!-- The source script as plain text, including all inner informations and comments. -->
+            <conf name="src" />
+            <!-- An obfuscated, size-reduced version of the script. Use to speed up loading time in final environment. -->
+            <conf name="min" />
+        </artifact>
+    </publications>
+    <dependencies>
+        <!-- no dependency required -->
+    </dependencies>
+</ivy-module>
