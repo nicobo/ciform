@@ -4,7 +4,7 @@
    This script is an Ant script using Ivy extension to resolve dependencies.
    You will need both Ant (http://ant.apache.org/) and Ivy (http://ant.apache.org/ivy) to use it.
 -->
-<project name="crypto.rsa" default="package" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="Crypto.RSA" default="package" xmlns:ivy="antlib:org.apache.ivy.ant">
 
     <!-- ==================== -->
     <!-- Settings -->
@@ -85,7 +85,7 @@
             <arg value="--no-lexical-privates"/>
             <arg value="--package-naming"/>
             <arg value="--nested-file-naming"/>
-            <arg line="--project-name Crypto.RSA"/>
+            <arg line="--project-name ${ant.project.name}"/>
             <arg value="${src.dir}"/>
         </exec>
         <echo message="Done generating doc." />
