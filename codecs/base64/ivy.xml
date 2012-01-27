@@ -1,8 +1,9 @@
 <ivy-module version="2.0">
-    <info organisation="crypto" module="hex" revision="1.0.0" status="integration" publication="20120127121502">
+    <info organisation="crypto" module="base64" revision="1.0.0" status="integration" publication="20120127121502">
+        <license name="Copyright 2005 Herbert Hanewinkel" url="www.haneWIN.de"/>
         <ivyauthor name="Nicolas BONARDELLE" url="http://nicobo.net/contact?subject=crypto+hex+ivy"/>
         <description homepage="http://code.google.com/p/ciform">
-            This library provides conversion functions from/to hexadecimal format.
+            OpenPGP radix-64/base64 string encoding/decoding.
         </description>
     </info>
     <configurations>
@@ -12,8 +13,8 @@
       <conf name="minified"/>
     </configurations>
     <publications>
-        <artifact name="hex" type="js" conf="source"/>
-        <artifact name="hex-min" type="js" conf="minified"/>
+        <artifact name="base64" type="js" conf="source"/>
+        <artifact name="base64-min" type="js" conf="minified"/>
     </publications>
     <dependencies>
         <!-- no dependency required -->

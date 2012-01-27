@@ -7,3 +7,9 @@ tools/yuicompressor-*.jar
 tools/ivy-*.jar
 codecs/hex/local.properties
 codecs/hex/target
+codecs/base64/target
+tools/jsdoc-toolkit
+codecs/rsa/build
+codecs/base64/build
+codecs/base64/local.properties
+codecs/hex/build
