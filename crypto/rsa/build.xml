@@ -5,10 +5,13 @@
 -->
 <project name="Crypto.RSA" default="javascript.package" xmlns:ivy="antlib:org.apache.ivy.ant">
 
-    <!-- custom, local only, properties for this project -->
+    <!-- local properties for this project -->
     <property file="local.properties"/>
     <!-- default properties for this project -->
     <property file="build.properties"/>
+
+    <!-- common properties for all projects -->
+    <property file="${common.properties}"/>
 
     <!-- template for javascript projects -->
     <import file="${ant.jsproject.path}" />

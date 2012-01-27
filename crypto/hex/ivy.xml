@@ -1,5 +1,5 @@
 <ivy-module version="2.0">
-    <info organisation="crypto" module="hex" revision="1.0.0" status="integration" publication="20120127121502">
+    <info organisation="crypto" module="hex" revision="1.0.0" status="integration" publication="20120127183653">
         <ivyauthor name="Nicolas BONARDELLE" url="http://nicobo.net/contact?subject=crypto+hex+ivy"/>
         <description homepage="http://code.google.com/p/ciform">
             This library provides conversion functions from/to hexadecimal format.

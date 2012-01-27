@@ -6,6 +6,18 @@
 <project name="javascript" default="package" xmlns:ivy="antlib:org.apache.ivy.ant">
 
     <!--
+        Loads default properties : simple convenience (not specific to Javascript)
+    -->
+
+    <!-- example of use : local properties for the main project only -->
+    <property file="local.properties"/>
+    <!-- example of use : default properties for the main project only -->
+    <property file="build.properties"/>
+    <!-- example of use : default generic properties -->
+    <property file="default.properties"/>
+
+
+    <!--
         Loads dependent tasks
     -->
 

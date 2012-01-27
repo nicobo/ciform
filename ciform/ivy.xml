@@ -1,7 +1,7 @@
 <ivy-module version="2.0">
-    <info organisation="ciform" module="" revision="1.0.0" status="integration" publication="20120127120313">
-        <license name="LGPL" url="http://plugnauth.sf.net/ciform/license" />
-        <ivyauthor name="Nicolas BONARDELLE" url="http://nicobo.net/contact?subject=ciform+ivy" />
+    <info organisation="ciform" module="" revision="1.0.0" status="integration" publication="20120127183109">
+        <license name="LGPL" url="http://plugnauth.sf.net/ciform/license"/>
+        <ivyauthor name="Nicolas BONARDELLE" url="http://nicobo.net/contact?subject=ciform+ivy"/>
         <description homepage="http://plugnauth.sourceforge.net/ciform">
             Ciform encrypts web forms before they are submitted, so data is not sent in clear text over the Internet.
         </description>
@@ -11,15 +11,15 @@
       <conf name="standalone"/>
     </configurations>
     <publications>
-      <artifact name="ciform" type="js" conf="core" />
-      <artifact name="ciform-min" type="js" conf="core" />
-      <artifact name="minilib" type="js" conf="core" />
-      <artifact name="minilib-min" type="js" conf="core" />
-      <artifact name="libciform" type="js" conf="standalone" />
-      <artifact name="libciform-min" type="js" conf="standalone" />
+      <artifact name="ciform" type="js" conf="core"/>
+      <artifact name="ciform-min" type="js" conf="core"/>
+      <artifact name="minilib" type="js" conf="core"/>
+      <artifact name="minilib-min" type="js" conf="core"/>
+      <artifact name="libciform" type="js" conf="standalone"/>
+      <artifact name="libciform-min" type="js" conf="standalone"/>
     </publications>
     <dependencies>
-      <dependency org="crypto" name="rsa" rev="latest.integration" conf="core->minified;standalone->minified" />
-      <dependency org="crypto" name="sha1" rev="latest.integration" conf="core->minified;standalone->minified" />
+      <dependency org="crypto" name="rsa" rev="1.0.0" revConstraint="latest.integration" conf="core->minified;standalone->minified"/>
+      <dependency org="crypto" name="sha1" rev="1.0.0" revConstraint="latest.integration" conf="core->minified;standalone->minified"/>
     </dependencies>
 </ivy-module>

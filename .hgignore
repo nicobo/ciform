@@ -20,3 +20,11 @@ codecs/sha1/local.properties
 codecs/sha1/target
 ciform/build
 ciform/lib
+crypto/base64/build
+crypto/base64/target
+crypto/hex/target
+crypto/hex/build
+crypto/rsa/target
+crypto/rsa/build
+crypto/sha1/target
+crypto/sha1/build
