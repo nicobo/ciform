@@ -13,3 +13,10 @@ codecs/rsa/build
 codecs/base64/build
 codecs/base64/local.properties
 codecs/hex/build
+ciform/local.properties
+ciform/target
+codecs/sha1/build
+codecs/sha1/local.properties
+codecs/sha1/target
+ciform/build
+ciform/lib

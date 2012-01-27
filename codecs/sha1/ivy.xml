@@ -1,18 +1,21 @@
 <ivy-module version="2.0">
-    <info organisation="crypto" module="sha1" revision="2.1a" status="integration">
-        <license name="Copyright 2000 - 2002 Paul Johnston" url="http://pajhome.org.uk/crypt/md5/" />
-        <license name="BSD License" url="http://pajhome.org.uk/site/legal.html#bsdlicense" />
-        <ivyauthor name="Nicolas BONARDELLE" url="http://nicobo.net/contact?subject=crypto+sha1+ivy" />
-        <repository name="plugnauth@sourceforge" url="http://plugnauth.sourceforge.net/ivy" ivys="true" artifacts="true" />
-        <description homepage="http://plugnauth.sourceforge.net/crypto">
-            This library provides an implementation of the SHA-1 hash algorithm.
+    <info organisation="crypto" module="sha1" revision="1.0.0" status="integration" publication="20120127135932">
+        <license name="Copyright Paul Johnston 2000 - 2002" url="http://pajhome.org.uk/crypt/md5"/>
+        <license name="BSD License"/>
+        <ivyauthor name="Nicolas BONARDELLE" url="http://nicobo.net/contact?subject=crypto+base64+ivy"/>
+        <description homepage="http://code.google.com/p/ciform">
+            A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined in FIPS PUB 180-1
         </description>
     </info>
+    <configurations>
+      <!-- The source script as plain text, including all inner informations and comments. -->
+      <conf name="source"/>
+      <!-- An obfuscated, size-reduced version of the script. Use to speed up loading time in final environment. -->
+      <conf name="minified"/>
+    </configurations>
     <publications>
-        <!-- The source script as plain text, including all inner informations and comments. -->
-        <artifact name="sha1" type="javascript" ext="js" />
-        <!-- An obfuscated, size-reduced version of the script. Use to speed up loading time in final environment. -->
-        <artifact name="sha1-compressed" type="javascript" ext="js" />
+        <artifact name="sha1" type="js" conf="source"/>
+        <artifact name="sha1-min" type="js" conf="minified"/>
     </publications>
     <dependencies>
         <!-- no dependency required -->

@@ -27,6 +27,13 @@
     </target>
 
     <target name="compile" depends="validate" description="Compiles the source code of the project.">
+        <!-- We use this target to copy all required files for the tests together in a consistent hierarchy -->
+        <!--
+        <copy file="${jsunit.coreJs}" todir="${jsunit.tmp}"/>
+        <copy todir="${jsunit.tmp}" overwrite="true">
+            <resources refid="jsunit.in.files"/>
+        </copy>
+        -->
         <!-- nothing more to do -->
     </target>
 
@@ -39,6 +46,29 @@
     </target>
 
     <target name="integration-test" depends="package" description="Processes and deploys the package if necessary into an environment where integration tests can be run.">
+
+        <!-- Testing the compressed version of the library -->
+
+        <!-- Replaces the tested library with the compressed version -->
+        <!-- FIXME : it's not clean : it should not override a file already in build.dir -->
+        <!--
+        <copy file="${target.dir}/${ant.project.name}-compressed-${ivy.revision}.js" tofile="${build.dir}/sha1.js"/>
+        -->
+
+        <!--
+        <resources id="jsunit.in.files">
+            <file file="${build.dir}/sha1.js"/>
+            <fileset dir="${tests.dir}"/>
+        </resources>
+        -->
+
+        <!--
+        <antcall target="jsunit">
+            <reference refid="jsunit.in.files"/>
+            <param name="jsunit.in.testsuite" value="AllTests.html"/>
+            <param name="jsunit.out.logs" value="${tests.logs}"/>
+        </antcall>
+        -->
         <!-- nothing more to do -->
     </target>
 
@@ -56,7 +86,7 @@
         <!-- nothing more to do -->
     </target>
 
-    <target name="clean" description="Cleans this project.">
+    <target name="clean" description="Restores the initial state of the project, deleting any generated file.">
         <delete includeemptydirs="true" failonerror="false">
             <fileset dir="${build.dir}"/>
             <fileset dir="${target.dir}"/>
@@ -112,6 +142,77 @@
             <arg file="${build.bigsource.js}"/>
         </java>
         <echo message="Minified : ${lib.dir}/${ivy.module}-min-${ivy.revision}.js" />
+    </target>
+
+
+
+    <!--
+        TODO fix and integrate the following targets
+    -->
+
+    <!--
+        Runs JsUnit tests. This target saves a lot of verbosity in the projects' build scripts.
+        
+        Firefox 3 users : change the security.fileuri.strict_origin_policy parameter to 'false' for the following target to work
+        
+        // static configuration
+        @in jsunit.dir          the directory where JsUnit resides
+        @in jsunit.coreJs       the jsUnitCore.js file
+        @in jsunit.testRunner   the test runner's HTML page
+        -->
+    <!--<taskdef name="jsunit" classname="net.jsunit.ant.StandaloneTestTask" classpath="/home/cbonar/src/jsunit/java/bin" />-->
+
+    <!-- NOTE : These tests should not require the code be packaged or deployed. -->
+    <target name="test-fixme" depends="compile" description="Tests the compiled source code using a suitable unit testing framework.">
+
+        <jsunit showoutput="true"
+                printsummary="true"
+                filtertrace="false"
+                jsUnitRoot="${jsunit.dir}"
+                haltonfailure="true"
+                haltonerror="true"
+                >
+            <sysproperty key="browserFileNames" value="${jsunit.browsers}"/>
+            <sysproperty key="port" value="45678"/>
+            <sysproperty key="logsDirectory" value="${tests.logs}"/>
+            <test todir="${tests.logs}">
+                <fileset dir="${src.dir}" includes="**/*.js"/>
+                <fileset dir="${tests.dir}" includes="**/*.js"/>
+            </test>
+            <!--
+            <scripts dir="${src.dir}" includes="**/*.js"/>
+            <scripts dir="${tests.dir}" includes="**/*.js"/>
+            -->
+            <classpath>
+                <fileset dir="${jsunit.dir}/java/lib">
+                    <include name="*.jar"/>
+                </fileset>
+                <!--
+                    <fileset dir="${jsunit.dir}/java/bin">
+                        <include name="jsunit.jar"/>
+                    </fileset>
+                -->
+                <dirset dir="/home/cbonar/src/jsunit/java/bin"/>
+                <dirset dir="${jsunit.dir}/java/config"/>
+            </classpath>
+            <formatter type="xml"/>
+        </jsunit>
+
+    </target>
+
+    <!-- Generates developer documentation using (old) jsdoc. -->
+    <target name="jsdoc" depends="validate">
+        <!-- Generates a report of dependencies -->
+        <ivy:report todir="${doc.dir}"/>
+        <!-- Generates the API doc -->
+        <exec command="${jsdoc}" failonerror="true">
+            <arg value="-d"/> <arg value="${doc.dir}"/>
+            <arg value="--no-lexical-privates"/>
+            <arg value="--package-naming"/>
+            <arg value="--nested-file-naming"/>
+            <arg line="--project-name Crypto.SHA1"/>
+            <arg value="${src.dir}"/>
+        </exec>
     </target>
 
 </project>
