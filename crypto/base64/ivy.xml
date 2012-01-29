@@ -1,5 +1,5 @@
 <ivy-module version="2.0">
-    <info organisation="crypto" module="base64" revision="1.0.0" status="integration" publication="20120127183633">
+    <info organisation="crypto" module="base64" revision="1.0.0" status="integration">
         <license name="Copyright 2005 Herbert Hanewinkel" url="www.haneWIN.de"/>
         <ivyauthor name="Nicolas BONARDELLE" url="http://nicobo.net/contact?subject=crypto+base64+ivy"/>
         <description homepage="http://code.google.com/p/ciform">
