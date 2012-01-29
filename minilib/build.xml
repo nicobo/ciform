@@ -1,0 +1,19 @@
+<!--
+   Build script for the project "minilib".
+
+   This script is based on a template for Javascript projects.
+-->
+<project name="minilib" default="javascript.package" xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <!-- local properties for this project -->
+    <property file="local.properties"/>
+    <!-- default properties for this project -->
+    <property file="build.properties"/>
+
+    <!-- common properties for all projects -->
+    <property file="${common.properties}"/>
+
+    <!-- template for javascript projects -->
+    <import file="${ant.jsproject.path}" />
+
+</project>

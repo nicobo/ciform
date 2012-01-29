@@ -14,4 +14,66 @@
     <!-- template for javascript projects -->
     <import file="${ant.jsproject.path}" />
 
+    <property name="src.php.dir" value="${src.dir}/php" />
+
+    <target name="phpdoc" description="Generates PHP API docs">
+        <mkdir dir="${target.dir}/doc/api/php" />
+        <exec command="${phpdoc.exe}" failonerror="true">
+            <arg value="--directory" />
+                <arg file="${src.php.dir}" />
+                <!--<arg file="${src.php.dir},/opt/PEAR/Crypt" />-->
+            <arg value="--pear"/>
+            <arg value="--target"/>
+                <arg file="${target.dir}/doc/api/php/"/>
+            <arg line="--output HTML:Smarty:PHP"/>
+            <arg line="--sourcecode on"/>
+            <arg value="--title"/>
+                <arg value="${ant.project.name} PHP API documentation"/>
+            <arg line="--parseprivate on"/>
+        </exec>
+    </target>
+
+    <target name="build-lib" depends="validate" description="Builds the bigsource file to work with for the 'lib' artifact" >
+        <tempfile property="build.bigsource.js" destDir="${build.dir}" prefix="lib${ant.project.name}" suffix=".js" />
+        <!-- TODO handle encoding (and eol?) -->
+        <concat destfile="${build.bigsource.js}">
+            <fileset dir="${src.dir}">
+                <!-- order is important because of function dependencies -->
+                <include name="${lib.dir}/hex*.js" />
+                <include name="${lib.dir}/base64*.js" />
+                <include name="${lib.dir}/sha1*.js" />
+                <include name="${lib.dir}/rsa*.js" />
+                <include name="${src.dir}/minilib.js" />
+                <include name="${src.dir}/ciform.js" />
+            </fileset>
+        </concat>
+        <echo message="Created : ${build.bigsource.js}" level="verbose" />
+    </target>
+
+    <target name="nico" >
+    </target>
+
+    <target name="resolve-dependencies" description="(internal) Builds an ordered list of dependent modules." >
+        <ivy:buildlist root="ciform" excluderoot="true" reference="build.lib.ants">
+            <fileset dir="." includes="build.xml" />
+            <fileset dir="../crypto" includes="**/build.xml"/>
+            <fileset dir="../minilib" includes="**/build.xml"/>
+        </ivy:buildlist>
+    </target>
+
+    <target name="install-all" depends="resolve-dependencies" description="Builds all dependent projects and installs their artifacts into the local Ivy repo.">
+        <!-- executes the build script on each dependent module -->
+        <subant buildpathref="build.lib.ants">
+            <target name="package" />
+            <target name="install" />
+        </subant>
+    </target>
+
+    <target name="clean-all" depends="resolve-dependencies" description="Builds all dependent projects and installs their artifacts into the local Ivy repo.">
+        <!-- executes the build script on each dependent module -->
+        <subant buildpathref="build.lib.ants">
+            <target name="clean" />
+        </subant>
+    </target>
+
 </project>

@@ -1,5 +1,5 @@
 <ivy-module version="2.0">
-    <info organisation="ciform" module="" revision="1.0.0" status="integration" publication="20120127183109">
+    <info organisation="nicobo" module="ciform" revision="1.0.0" status="integration" publication="20120127183109">
         <license name="LGPL" url="http://plugnauth.sf.net/ciform/license"/>
         <ivyauthor name="Nicolas BONARDELLE" url="http://nicobo.net/contact?subject=ciform+ivy"/>
         <description homepage="http://plugnauth.sourceforge.net/ciform">
@@ -7,19 +7,20 @@
         </description>
     </info>
     <configurations>
-      <conf name="core"/>
-      <conf name="standalone"/>
+      <conf name="source"/>
+      <conf name="minified"/>
     </configurations>
     <publications>
-      <artifact name="ciform" type="js" conf="core"/>
-      <artifact name="ciform-min" type="js" conf="core"/>
-      <artifact name="minilib" type="js" conf="core"/>
-      <artifact name="minilib-min" type="js" conf="core"/>
-      <artifact name="libciform" type="js" conf="standalone"/>
-      <artifact name="libciform-min" type="js" conf="standalone"/>
+      <artifact name="ciform" type="js" conf="source"/>
+      <artifact name="ciform-min" type="js" conf="minified"/>
+      <artifact name="libciform" type="js" conf="source"/>
+      <artifact name="libciform-min" type="js" conf="minified"/>
     </publications>
     <dependencies>
-      <dependency org="crypto" name="rsa" rev="1.0.0" revConstraint="latest.integration" conf="core->minified;standalone->minified"/>
-      <dependency org="crypto" name="sha1" rev="1.0.0" revConstraint="latest.integration" conf="core->minified;standalone->minified"/>
+      <dependency org="nicobo" name="minilib" rev="latest.integration" conf="*->source" />
+      <dependency org="crypto" name="hex" rev="latest.integration" conf="*->source" />
+      <dependency org="crypto" name="base64" rev="latest.integration" conf="*->source" />
+      <dependency org="crypto" name="sha1" rev="latest.integration" conf="*->source" />
+      <dependency org="crypto" name="rsa" rev="latest.integration" conf="*->source" />
     </dependencies>
 </ivy-module>

@@ -1,0 +1,19 @@
+<ivy-module version="2.0">
+    <info organisation="nicobo" module="minilib" revision="1.0.0" status="integration">
+        <license name="BSD simplified" url="http://www.opensource.org/licenses/BSD-2-Clause"/>
+        <ivyauthor name="Nicolas BONARDELLE" url="http://nicobo.net/contact?subject=minilib+ivy"/>
+        <description homepage="http://ciform.googlecode.com">
+            Small set of core Javascript functions to avoid dependending on bigger frameworks like jquery when possible.
+        </description>
+    </info>
+    <configurations>
+      <conf name="source"/>
+      <conf name="minified"/>
+    </configurations>
+    <publications>
+      <artifact name="minilib" type="js"/>
+    </publications>
+    <dependencies>
+        <!-- none -->
+    </dependencies>
+</ivy-module>

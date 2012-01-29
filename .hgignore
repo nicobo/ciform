@@ -28,3 +28,7 @@ crypto/rsa/target
 crypto/rsa/build
 crypto/sha1/target
 crypto/sha1/build
+tools/php-5.3.9-Win32-VC9-x86
+tools/PhpDocumentor-1.4.4
+minilib/lib
+tools/build/common.properties
