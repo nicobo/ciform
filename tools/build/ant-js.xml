@@ -161,6 +161,9 @@
         <echo message="Minified : ${target.lib.dir}/${ivy.module}-min-${ivy.revision}.js" />
     </target>
 
+    <target name="build-pom" depends="validate" description="Builds a Maven POM.">
+        <ivy:makepom ivyfile="${basedir}/ivy.xml" pomfile="${target.dir}/pom.xml" />
+    </target>
 
 
     <!--
