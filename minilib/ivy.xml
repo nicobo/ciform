@@ -7,8 +7,8 @@
         </description>
     </info>
     <configurations>
-      <conf name="source"/>
-      <conf name="minified"/>
+      <conf name="source" description="The library in clear, meaning visible source code and comments." />
+      <conf name="minified" description="An obfuscated, size-reduced version of the script. Use to speed up loading time in final environment. " />
     </configurations>
     <publications>
       <artifact name="minilib" type="js"/>

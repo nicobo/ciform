@@ -8,10 +8,8 @@
         </description>
     </info>
     <configurations>
-      <!-- The source script as plain text, including all inner informations and comments. -->
-      <conf name="source"/>
-      <!-- An obfuscated, size-reduced version of the script. Use to speed up loading time in final environment. -->
-      <conf name="minified"/>
+      <conf name="source" description="The library in clear, meaning visible source code and comments." />
+      <conf name="minified" description="An obfuscated, size-reduced version of the script. Use to speed up loading time in final environment. " />
     </configurations>
     <publications>
         <artifact name="rsa" type="js" conf="source"/>

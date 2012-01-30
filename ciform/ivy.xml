@@ -7,14 +7,14 @@
         </description>
     </info>
     <configurations>
-      <conf name="source"/>
-      <conf name="minified"/>
+      <conf name="source" description="The library in clear, meaning visible source code and comments." />
+      <conf name="minified" description="An obfuscated, size-reduced version of the script. Use to speed up loading time in final environment. " />
     </configurations>
     <publications>
-      <artifact name="ciform" type="js" conf="source"/>
-      <artifact name="ciform-min" type="js" conf="minified"/>
-      <artifact name="libciform" type="js" conf="source"/>
-      <artifact name="libciform-min" type="js" conf="minified"/>
+      <!-- ciform core library -->
+      <artifact name="ciform" type="js" />
+      <!-- ciform and all dependencies in a single artifact -->
+      <artifact name="libciform" type="js" />
     </publications>
     <dependencies>
       <dependency org="nicobo" name="minilib" rev="latest.integration" conf="*->source" />

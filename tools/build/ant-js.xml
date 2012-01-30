@@ -55,7 +55,7 @@
         <!-- nothing more to do -->
     </target>
 
-    <target name="package" depends="build-src, build-min, test, doc" description="Takes the compiled code and package it in its distributable format, such as a JAR.">
+    <target name="package" depends="build-src, build-min, test" description="Takes the compiled code and package it in its distributable format, such as a JAR.">
         <!-- TODO call a target "build-<conf>" for each Ivy configuration -->
         <!-- nothing more to do -->
     </target>
@@ -113,7 +113,7 @@
         Some more specific targets
     -->
 
-    <target name="doc" depends="validate" description="Generates developer documentation.">
+    <target name="site" depends="validate" description="Generates site (developer) documentation for this project.">
 
         <!-- Generates a report of dependencies -->
         <ivy:report todir="${target.dir}/doc/ivy"/>
