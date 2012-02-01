@@ -35,3 +35,5 @@ tools/build/common.properties
 tools/apache-ivy-2.2.0
 tools/jsdoc_toolkit-2.4.0
 tools/yuicompressor-2.4.7
+minilib/build
+minilib/target

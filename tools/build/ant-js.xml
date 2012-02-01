@@ -3,6 +3,7 @@
 
    To use it, projects must import this file into their own build.xml and define all variables.
 -->
+<!-- TODO define all base targets as extension-point and make javascript.* targets -->
 <project name="javascript" default="package" xmlns:ivy="antlib:org.apache.ivy.ant">
 
     <!--
@@ -31,6 +32,7 @@
 
     <!--
         Main targets : they are greatly inspired from the Maven build lifecycle
+        See http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Lifecycle_Reference
     -->
 
     <target name="validate" description="Validates the project is correct and all necessary information is available.">
@@ -40,7 +42,7 @@
         <mkdir dir="${target.dir}" />
     </target>
 
-    <target name="compile" depends="validate" description="Compiles the source code of the project.">
+    <extension-point name="compile" depends="validate" description="Compiles the source code of the project.">
         <!-- We use this target to copy all required files for the tests together in a consistent hierarchy -->
         <!--
         <copy file="${jsunit.coreJs}" todir="${jsunit.tmp}"/>
@@ -49,16 +51,11 @@
         </copy>
         -->
         <!-- nothing more to do -->
-    </target>
+    </extension-point>
 
-    <target name="test" depends="compile" description="Tests the compiled source code using a suitable unit testing framework. These tests should not require the code be packaged or deployed.">
-        <!-- nothing more to do -->
-    </target>
+    <extension-point name="test" depends="compile" description="Tests the compiled source code using a suitable unit testing framework. These tests should not require the code be packaged or deployed." />
 
-    <target name="package" depends="build-src, build-min, test" description="Takes the compiled code and package it in its distributable format, such as a JAR.">
-        <!-- TODO call a target "build-<conf>" for each Ivy configuration -->
-        <!-- nothing more to do -->
-    </target>
+    <extension-point name="package" depends="build-default, build-minified, test" description="Takes the compiled code and package it in its distributable format, such as a JAR." />
 
     <target name="integration-test" depends="package" description="Processes and deploys the package if necessary into an environment where integration tests can be run.">
 
@@ -87,19 +84,15 @@
         <!-- nothing more to do -->
     </target>
 
-    <target name="verify" depends="integration-test" description="Runs any checks to verify the package is valid and meets quality criteria.">
-        <!-- nothing more to do -->
-    </target>
+    <extension-point name="verify" depends="integration-test" description="Runs any checks to verify the package is valid and meets quality criteria." />
 
-    <target name="install" depends="build-src, build-min, test" description="Installs the package into the local repository, for use as a dependency in other projects locally.">
+    <target name="install" depends="build-default, build-minified, test" description="Installs the package into the local repository, for use as a dependency in other projects locally.">
         <!-- 'local' resolver is a default one bundled with Ivy -->
         <!-- 'artifactspattern' must match the name of the files this script builds -->
         <ivy:publish resolver="local" artifactspattern="${target.lib.dir}/[artifact]-[revision].[ext]" overwrite="true" forcedeliver="true" />
     </target>
 
-    <target name="deploy" depends="verify" description="Done in an integration or release environment, copies the final package to the remote repository for sharing with other developers and projects.">
-        <!-- nothing more to do -->
-    </target>
+    <extension-point name="deploy" depends="verify" description="Done in an integration or release environment, copies the final package to the remote repository for sharing with other developers and projects." />
 
     <target name="clean" description="Restores the initial state of the project, deleting any generated file.">
         <delete includeemptydirs="true" failonerror="false">
@@ -108,12 +101,14 @@
         </delete>
     </target>
 
+    <extension-point name="site" depends="site-doc" description="Generates site (developer) documentation for this project." />
+
 
     <!--
         Some more specific targets
     -->
 
-    <target name="site" depends="validate" description="Generates site (developer) documentation for this project.">
+    <target name="site-doc" depends="validate" description="Generates site (developer) documentation for this project.">
 
         <!-- Generates a report of dependencies -->
         <ivy:report todir="${target.dir}/doc/ivy"/>
@@ -130,7 +125,8 @@
             <arg value="--verbose" />
         </java>
 
-        <echo message="Done generating doc." />
+        <echo message="Done generating site." />
+
     </target>
 
     <!--
@@ -148,17 +144,37 @@
         <echo message="Created : ${build.bigsource.js}" level="verbose" />
     </target>
 
-    <target name="build-src" depends="build-bigsource" description="Builds the default .js.">
-        <copy file="${build.bigsource.js}" tofile="${target.lib.dir}/${ivy.module}-${ivy.revision}.js" />
-        <echo message="Copied : ${target.lib.dir}/${ivy.module}-${ivy.revision}.js" />
+    <macrodef name="make-default" description="Builds the default .js.">
+        <attribute name="bigsource" />
+        <attribute name="dir" default="${target.lib.dir}" />
+        <attribute name="module" default="${ivy.module}" />
+        <attribute name="revision" default="${ivy.revision}" />
+        <sequential>
+            <copy file="@{bigsource}" tofile="@{dir}/@{module}-@{revision}.js" />
+            <echo message="Copied : @{dir}/@{module}-@{revision}.js" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="make-min" description="Builds a minified version of the .js.">
+        <attribute name="bigsource" />
+        <attribute name="dir" default="${target.lib.dir}" />
+        <attribute name="module" default="${ivy.module}" />
+        <attribute name="revision" default="${ivy.revision}" />
+        <sequential>
+        <java jar="${yuicompressor.jar}" fork="true" output="@{dir}/@{module}-min-@{revision}.js" failonerror="true">
+            <arg line="--type js" />
+            <arg file="@{bigsource}"/>
+        </java>
+        <echo message="Minified : @{dir}/@{module}-min-@{revision}.js" />
+        </sequential>
+    </macrodef>
+
+    <target name="build-default" depends="build-bigsource" description="Builds the default .js.">
+        <make-default bigsource="${build.bigsource.js}" />
     </target>
 
-    <target name="build-min" depends="build-bigsource" description="Builds a minified version of the .js.">
-        <java jar="${yuicompressor.jar}" fork="true" output="${target.lib.dir}/${ivy.module}-min-${ivy.revision}.js" failonerror="true">
-            <arg line="--type js" />
-            <arg file="${build.bigsource.js}"/>
-        </java>
-        <echo message="Minified : ${target.lib.dir}/${ivy.module}-min-${ivy.revision}.js" />
+    <target name="build-minified" depends="build-bigsource" description="Builds a minified version of the .js.">
+        <make-min bigsource="${build.bigsource.js}" />
     </target>
 
     <target name="build-pom" depends="validate" description="Builds a Maven POM.">

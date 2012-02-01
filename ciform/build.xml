@@ -33,24 +33,30 @@
         </exec>
     </target>
 
-    <target name="build-lib" depends="validate" description="Builds the bigsource file to work with for the 'lib' artifact" >
+    <target name="build-biglib" depends="validate" description="Builds the bigsource file to work with for the 'lib' artifact" >
         <tempfile property="build.bigsource.js" destDir="${build.dir}" prefix="lib${ant.project.name}" suffix=".js" />
         <!-- TODO handle encoding (and eol?) -->
         <concat destfile="${build.bigsource.js}">
-            <fileset dir="${src.dir}">
-                <!-- order is important because of function dependencies -->
-                <include name="${lib.dir}/hex*.js" />
-                <include name="${lib.dir}/base64*.js" />
-                <include name="${lib.dir}/sha1*.js" />
-                <include name="${lib.dir}/rsa*.js" />
-                <include name="${src.dir}/minilib.js" />
-                <include name="${src.dir}/ciform.js" />
+            <!-- order is important because of function dependencies -->
+            <!-- TODO no direct reference to the directory where dependencies are stored -->
+            <fileset dir="${build.dir}/ivy/source">
+                <include name="hex*.js" />
+                <include name="base64*.js" />
+                <include name="sha1*.js" />
+                <include name="rsa*.js" />
+                <include name="minilib.js" />
             </fileset>
+            <fileset dir="${src.dir}" includes="*.js" />
         </concat>
         <echo message="Created : ${build.bigsource.js}" level="verbose" />
     </target>
 
-    <target name="nico" >
+    <target name="build-libdefault" extensionOf="package" depends="build-biglib" description="Builds the default .js.">
+        <make-default bigsource="${build.bigsource.js}" module="libciform" />
+    </target>
+
+    <target name="build-libmin" extensionOf="package" depends="build-biglib" description="Builds a minified version of the .js.">
+        <make-min bigsource="${build.bigsource.js}" module="libciform" />
     </target>
 
     <target name="resolve-dependencies" description="(internal) Builds an ordered list of dependent modules." >
