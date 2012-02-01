@@ -1,3 +1,19 @@
+//
+// NOTE : The original code is wrapped so that the defined functions don't collide with existing ones.
+// See http://michaux.ca/articles/javascript-namespacing.
+// See http://msdn.microsoft.com/en-us/library/259s7zc1%28v=vs.85%29.aspx
+//
+
+/** @namespace */
+Crypto = typeof Crypto != 'undefined' ? Crypto : {};
+/** @namespace */
+Crypto.SHA1 = (function(/*window, undefined, $*/) {
+
+//
+// START OF ORIGINAL CODE
+//
+
+
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
  * in FIPS PUB 180-1
@@ -200,3 +216,16 @@ function binb2b64(binarray)
   }
   return str;
 }
+
+//
+// END OF ORIGINAL CODE
+//
+
+return {
+    str2binb: str2binb,
+    binb2str: binb2str,
+    binb2hex: binb2hex,
+    binb2b64: binb2b64
+};
+
+})(/*window, undefined, $*/);

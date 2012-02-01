@@ -1,3 +1,18 @@
+//
+// NOTE : The original code is wrapped so that the defined functions don't collide with existing ones.
+// See http://michaux.ca/articles/javascript-namespacing.
+// See http://msdn.microsoft.com/en-us/library/259s7zc1%28v=vs.85%29.aspx
+//
+
+/** @namespace */
+Crypto = typeof Crypto != 'undefined' ? Crypto : {};
+/** @namespace */
+Crypto.Base64 = (function(/*window, undefined, $*/) {
+
+//
+// START OF ORIGINAL CODE
+//
+
 
 /* OpenPGP radix-64/base64 string encoding/decoding
  * Copyright 2005 Herbert Hanewinkel, www.haneWIN.de
@@ -81,3 +96,14 @@ function r2s(t)
  }
  return r;
 }
+
+//
+// END OF ORIGINAL CODE
+//
+
+return {
+    s2r: s2r,
+    r2s: r2s,
+};
+
+})(/*window, undefined, $*/);

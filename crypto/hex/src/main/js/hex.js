@@ -1,8 +1,13 @@
 //
 // NOTE : The original code is wrapped so that the defined functions don't collide with existing ones.
 // See http://michaux.ca/articles/javascript-namespacing.
+// See http://msdn.microsoft.com/en-us/library/259s7zc1%28v=vs.85%29.aspx
 //
-Crypto_Hex = (function() {
+
+/** @namespace */
+Crypto = typeof Crypto != 'undefined' ? Crypto : {};
+/** @namespace */
+Crypto.Hex = (function(/*window, undefined, $*/) {
 
 //
 // START OF ORIGINAL CODE
@@ -95,4 +100,4 @@ return {
     hex2s: hex2s
 };
 
-})();
+})(/*window, undefined, $*/);

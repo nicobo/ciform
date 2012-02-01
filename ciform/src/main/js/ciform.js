@@ -5,6 +5,8 @@
 // Copyright © 2008 Nicolas BONARDELLE <http://nicobo.net/contact>
 //
 
+(function( $defined ) {
+
 
 /**
 	@fileoverview
@@ -50,7 +52,7 @@ var toServer2 = new {@link Ciform.Cipher Ciform.Cipher}({'pubKey':pubKey2});
 ...
 toServer1.encryptForm(document.forms[1]);
 ...
-toServer2.encryptField($('country'));
+toServer2.encryptField($('#country'));
 	</pre></code>
 	</p>
 
@@ -84,28 +86,24 @@ document.getElementById('anAnchor').href = ciform.{@link Ciform.Cipher#encryptUR
 
 
 /**
-	@class Defines a namespace for this project.
+	@namespace Defines a namespace for this project.
 		<p>NOTE : The first letter is in upper case mainly to prevent errors like using 'ciform' to name a variable,
 		and because it should also be considered as an Object containing the definitions of this library.<br>
 		It is not very clean since other namespaces are named with lower case characters, but there's currently no perfect solution in Javascript.</p>
-	@constructor (FIXME : this is a fix for this namespace to appear in doc)
 */
-Ciform = function(){};	// FIXME : this is a fix for this namespace to appear in doc
 Ciform = {};
 
 
 
 /**
-	@class This namespace contains the constants required for the client to communicate with the server.<br>
+	@namespace This namespace contains the constants required for the client to communicate with the server.<br>
 
 		<p>Data from the server is served as a literal object indexed with some of those constants.<br>
 		e.g. <code>{ 'serverURL':"login.php", 'pubKey':{'type':'rsa', 'e':10000,'pq':24} }</code>.</p>
 
 		<p>The normal behavior is to retrieve the protocol from the server and to compare it to the one of this library,
 		in order to know if they're compatible.</p>
-	@constructor (FIXME : this is a fix for this namespace to appear in doc)
 */
-Ciform.protocol = function(){};	// FIXME : this is a fix for this namespace to appear in doc
 Ciform.protocol = {};
 Ciform.protocol.prototype = new Object();
 
@@ -216,7 +214,7 @@ Ciform.Field.prototype = new Object();
 
 
 /**
-	@class This namespace contains a wrapper class for each supported encryption method :
+	@namespace This namespace contains a wrapper class for each supported encryption method :
 		it's a way to normalize encryption and to provide the upper layer an homogenous API.
 		This is the layer that really deals with the cryptographic functions.<br>
 
@@ -224,9 +222,7 @@ Ciform.Field.prototype = new Object();
 		without requiring to know the internals of the choosen cipher.</p>
 
 		<p>All encoders follow the {@link Ciform.ciphers.Encoder} interface.</p>
-	@constructor (FIXME : this is a fix for this namespace to appear in doc)
 */
-Ciform.ciphers = function(){};	// FIXME : this is a fix for this namespace to appear in doc
 Ciform.ciphers = {};
 
 
@@ -1223,3 +1219,5 @@ Ciform.Cipher.prototype.encryptURL = function( url, options )
 // 		return new Ciform.Cipher({});
 // 	}
 // }
+
+})($defined);
