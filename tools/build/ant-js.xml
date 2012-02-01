@@ -177,10 +177,13 @@
         <make-min bigsource="${build.bigsource.js}" />
     </target>
 
-    <target name="build-pom" depends="validate" description="Builds a Maven POM.">
+    <target name="build-pom" extensionOf="package" depends="validate, install" description="Builds a Maven POM.">
         <ivy:makepom ivyfile="${basedir}/ivy.xml" pomfile="${target.dir}/pom.xml" />
     </target>
 
+    <target name="make-deploy" extensionOf="deploy" depends="package" description="Deploys to the local 'publications' directory." >
+        <ivy:publish resolver="local" artifactspattern="${pub.dir}/[module]/[artifact]-[conf]-[revision].[ext]" overwrite="true" forcedeliver="true" />
+    </target>
 
     <!--
         TODO fix and integrate the following targets
