@@ -5,7 +5,7 @@
 // Copyright © 2008 Nicolas BONARDELLE <http://nicobo.net/contact>
 //
 
-(function( $defined ) {
+(function( $defined, Crypto, console ) {
 
 
 /**
@@ -201,7 +201,7 @@ Ciform.Field = function( target, options )
 
 		// 2. applies the encrypted value to the output field
 		this['output'].value = this._ciphertext;
-	}
+	};
 };
 Ciform.Field.prototype = new Object();
 
@@ -284,7 +284,7 @@ Ciform.ciphers.SHA1Encoder.prototype = new Ciform.ciphers.Encoder();
 Ciform.ciphers.SHA1Encoder.prototype.encode = function( message )
 {
 	console.debug(this,"encode(",message,")");
-	return (this['preamble'] ? "sha1:b64:" : "") + b64_sha1(message);
+	return (this['preamble'] ? "sha1:b64:" : "") + Crypto.SHA1.b64_sha1(message);
 };
 
 
@@ -404,7 +404,7 @@ Ciform.ciphers.RSAEncoder.prototype._getMPI = function()
 	// this function can be called several times so we don't compute the following each time
 	if ( ! this.pubKey['mpi'] )
 	{
-		this.pubKey['mpi'] = s2r(b2mpi(this.pubKey['pq'])+b2mpi([this.pubKey['e']])).replace(/\n/,'');
+		this.pubKey['mpi'] = Crypto.Base64.s2r(Crypto.RSA.b2mpi(this.pubKey['pq'])+Crypto.RSA.b2mpi([this.pubKey['e']])).replace(/\n/,'');
 	}
 
 	return this.pubKey['mpi'];
@@ -436,7 +436,7 @@ Ciform.ciphers.RSAEncoder.prototype._getSalt = function()
 */
 Ciform.ciphers.RSAEncoder.prototype.maxLength = function()
 {
-	var s = r2s(this._getMPI());
+	var s = Crypto.Base64.r2s(this._getMPI());
 	var l = Math.floor((s.charCodeAt(0)*256 + s.charCodeAt(1)+7)/8);
 
 	var lmax = l - 4;
@@ -490,12 +490,12 @@ Ciform.ciphers.RSAEncoder.prototype.encode = function( message )
 	   throw new RangeError("Plain text length must be less than "+maxLength+" characters");
 	}
 
-	var b = s2b(p);
+	var b = Crypto.Hex.s2b(p);
 
 	// rsa-encrypts the result and converts into mpi
-	var ciphertext = RSAencrypt(b,exp,mod);
+	var ciphertext = Crypto.RSA.encrypt(b,exp,mod);
 
-	return (this.preamble ? "rsa:0x" : "") + s2hex(b2s(ciphertext));
+	return (this.preamble ? "rsa:0x" : "") + Crypto.Hex.s2hex(Crypto.Hex.b2s(ciphertext));
 };
 
 
@@ -1220,4 +1220,4 @@ Ciform.Cipher.prototype.encryptURL = function( url, options )
 // 	}
 // }
 
-})($defined);
+})($defined,Crypto,console);

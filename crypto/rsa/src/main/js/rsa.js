@@ -411,8 +411,9 @@ function b2mpi(b)
 //
 
 return {
- encrypt: RSAencrypt,
- decrypt: RSAdecrypt
+    b2mpi: b2mpi,
+    encrypt: RSAencrypt,
+    decrypt: RSAdecrypt
 };
 
 })(/*window, undefined, $*/);

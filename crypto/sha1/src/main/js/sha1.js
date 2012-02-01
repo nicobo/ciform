@@ -222,10 +222,12 @@ function binb2b64(binarray)
 //
 
 return {
-    str2binb: str2binb,
-    binb2str: binb2str,
-    binb2hex: binb2hex,
-    binb2b64: binb2b64
+    hex_sha:hex_sha1,
+    b64_sha1:b64_sha1,
+    str_sha1:str_sha1,
+    hex_hmac_sha1:hex_hmac_sha1,
+    b64_hmac_sha1:b64_hmac_sha1,
+    str_hmac_sha1:str_hmac_sha1
 };
 
 })(/*window, undefined, $*/);
