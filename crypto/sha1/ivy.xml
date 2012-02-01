@@ -1,9 +1,9 @@
 <ivy-module version="2.0">
-    <info organisation="crypto" module="sha1" revision="1.0.0" status="integration">
+    <info organisation="nicommons.crypto" module="sha1" revision="1.0.0" status="integration">
         <license name="Copyright Paul Johnston 2000 - 2002" url="http://pajhome.org.uk/crypt/md5"/>
         <license name="BSD License"/>
         <ivyauthor name="Nicolas BONARDELLE" url="http://nicobo.net/contact?subject=crypto+base64+ivy"/>
-        <description homepage="http://code.google.com/p/ciform">
+        <description homepage="http://ciform.googlecode.com">
             A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined in FIPS PUB 180-1
         </description>
     </info>

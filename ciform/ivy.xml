@@ -17,10 +17,10 @@
       <artifact name="libciform" type="js" />
     </publications>
     <dependencies>
-      <dependency org="nicobo" name="minilib" rev="latest.integration" conf="*->source" />
-      <dependency org="crypto" name="hex" rev="latest.integration" conf="*->source" />
-      <dependency org="crypto" name="base64" rev="latest.integration" conf="*->source" />
-      <dependency org="crypto" name="sha1" rev="latest.integration" conf="*->source" />
-      <dependency org="crypto" name="rsa" rev="latest.integration" conf="*->source" />
+      <dependency org="nicommons.javascript" name="minilib" rev="latest.integration" conf="*->source" />
+      <dependency org="nicommons.crypto" name="hex" rev="latest.integration" conf="*->source" />
+      <dependency org="nicommons.crypto" name="base64" rev="latest.integration" conf="*->source" />
+      <dependency org="nicommons.crypto" name="sha1" rev="latest.integration" conf="*->source" />
+      <dependency org="nicommons.crypto" name="rsa" rev="latest.integration" conf="*->source" />
     </dependencies>
 </ivy-module>
