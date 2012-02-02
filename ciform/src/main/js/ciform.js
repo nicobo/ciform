@@ -9,73 +9,70 @@
 
 
 /**
-	@fileoverview
-
-	<p>This library provides specifications and basic functions to add encryption to HTML form elements.</p>
-
-	<p>It does not contain cryptographic functions ; it's more a 'user-friendly' wrapper
-	around cryptographic functions, dedicated to securing web forms.
-	</p>
-
-	<p>It has 2 layers :<ol>
-		<li>the {@link Ciform.ciphers} namespace contains the encoders used by Ciform.
-		 	This is the layer that really deals with the cryptographic functions.<br>
-		<li>the {@link Ciform top, 'user' layer} contains classes dedicated to encryption of the data
-			being exchanged between the client and the server.<br>
-		</ol>
-	</p>
-
-	<h5><b>Example 1 : encrypting password fields</b></h5>
-
-	<p>This way you define a simple encryption on all password fields of a form, that will take place when it is submitted.</p>
-	<code><pre>
-&lt;HEAD&gt;
-...
-&lt;SCRIPT type="text/javascript"&gt;
-	// pubKey is defined elsewhere : it is the public key used by the default RSA encoder
-	var mycipher = new {@link Ciform.Cipher Ciform.Cipher}({'pubKey':pubkey});
-&lt;/SCRIPT&gt;
-...
-&lt;/HEAD&gt;
-...
-&lt;FORM action="http://myserver/mypage.php" onsubmit="javascript:mycipher.{@link Ciform.Cipher#encryptForm encryptForm}(this,{'allowTypes':"password"});"&gt;
-...
-	</pre></code>
-
-	<h5><b>Example 2 : different types of encryption within the same page</b></h5>
-
-	<p>You can use several {@link Ciform.Cipher Ciform.Cipher} objects at the same time.</p>
-	<code><pre>
-var toServer1 = new {@link Ciform.Cipher Ciform.Cipher}({'pubKey':pubkey1});
-// in the following line the server is not the same one, so the public key is different
-var toServer2 = new {@link Ciform.Cipher Ciform.Cipher}({'pubKey':pubKey2});
-...
-toServer1.encryptForm(document.forms[1]);
-...
-toServer2.encryptField($('#country'));
-	</pre></code>
-	</p>
-
-	<h5><b>Example 3 : using the same object to encrypt different fields</b></h5>
-
-	<code><pre>
-var ciform = new {@link Ciform.Cipher Ciform.Cipher}({'pubKey':pubkey});
-...
-// encrypts an input field : the encrypted value will replace its current value
-ciform.{@link Ciform.Cipher#encryptField encryptField}(document.getElementById('myFieldId'));
-...
-// encrypts the parameters in a URL (and replaces the original value)
-document.getElementById('anAnchor').href = ciform.{@link Ciform.Cipher#encryptURL encryptURL}(document.getElementById('anAnchor').href);
-	</pre></code>
-
-	@requires http://www.hanewin.net/encrypt/rsa/base64.js
-	@requires http://www.hanewin.net/encrypt/rsa/hex.js
-	@requires http://pajhome.org.uk/crypt/md5/sha1.js
-	@requires http://www.hanewin.net/encrypt/rsa/rsa.js
-	@author cbonar at users dot sf dot net.
-
-	For more informations, see <a href="http://plugnauth.sourceforge.net/ciform">http://plugnauth.sourceforge.net/ciform</a>.
-*/
+ *	@fileoverview
+ *
+ *	<p>This library provides specifications and basic functions to add encryption to HTML form elements.</p>
+ *
+ *
+ *	<p>Home : <a href="http://ciform.googlecode.com">http://ciform.googlecode.com</a></p>
+ *
+ *	<p>It does not contain cryptographic functions ; it's more a 'user-friendly' wrapper
+ *	around cryptographic functions, dedicated to securing web forms.
+ *	</p>
+ *
+ *	<p>It has 2 layers :<ol>
+ *		<li>the {@link Ciform.ciphers} namespace contains the (external) encoders used by Ciform.
+ *		 	This is the layer that really deals with the cryptographic functions.<br>
+ *		<li>the {@link Ciform} top, 'user' layer contains classes dedicated to encryption of the data
+ *			being exchanged between the client and the server.<br>
+ *		</ol>
+ *	</p>
+ *
+ *	<h5><b>Example 1 : encrypting password fields</b></h5>
+ *
+ *	<p>This way you define a simple encryption on all password fields of a form, that will take place when it is submitted.</p>
+ *	<code><pre>
+ * &lt;HEAD&gt;
+ * ...
+ * &lt;SCRIPT type="text/javascript"&gt;
+ *	// pubKey is defined elsewhere : it is the public key used by the default RSA encoder
+ *	var mycipher = new {@link Ciform.Cipher}({'pubKey':pubkey});
+ * &lt;/SCRIPT&gt;
+ * ...
+ * &lt;/HEAD&gt;
+ * ...
+ * &lt;FORM action="http://myserver/mypage.php" onsubmit="javascript:mycipher.encryptForm(this,{'allowTypes':"password"});"&gt;
+ * ...
+ *	</pre></code>
+ *
+ *	<h5><b>Example 2 : different types of encryption within the same page</b></h5>
+ *
+ *	<p>You can use several {@link Ciform.Cipher} objects at the same time.</p>
+ *	<code><pre>
+ * var toServer1 = new {@link Ciform.Cipher}({'pubKey':pubkey1});
+ * // in the following line the server is not the same one, so the public key is different
+ * var toServer2 = new {@link Ciform.Cipher}({'pubKey':pubKey2});
+ * ...
+ * toServer1.encryptForm(document.forms[1]);
+ * ...
+ * toServer2.encryptField($('#country'));
+ *	</pre></code>
+ *	</p>
+ *
+ *	<h5><b>Example 3 : using the same object to encrypt different fields</b></h5>
+ *
+ *	<code><pre>
+ * var ciform = new {@link Ciform.Cipher}({'pubKey':pubkey});
+ * ...
+ * // encrypts an input field : the encrypted value will replace its current value ; see  {@link Ciform.Cipher#encryptField}
+ * ciform.encryptField(document.getElementById('myFieldId'));
+ * ...
+ * // encrypts the parameters in a URL (and replaces the original value) : {@link Ciform.Cipher#encryptURL}
+ * document.getElementById('anAnchor').href = ciform.encryptURL(document.getElementById('anAnchor').href);
+ *	</pre></code>
+ *
+ *	@author <a href="http://nicobo.net/contact">nicobo</a>
+ */
 
 
 
@@ -90,6 +87,11 @@ document.getElementById('anAnchor').href = ciform.{@link Ciform.Cipher#encryptUR
 		<p>NOTE : The first letter is in upper case mainly to prevent errors like using 'ciform' to name a variable,
 		and because it should also be considered as an Object containing the definitions of this library.<br>
 		It is not very clean since other namespaces are named with lower case characters, but there's currently no perfect solution in Javascript.</p>
+
+	@requires http://www.hanewin.net/encrypt/rsa/base64.js
+	@requires http://www.hanewin.net/encrypt/rsa/hex.js
+	@requires http://pajhome.org.uk/crypt/md5/sha1.js
+	@requires http://www.hanewin.net/encrypt/rsa/rsa.js
 */
 Ciform = {};
 
@@ -571,10 +573,10 @@ Ciform.ciphers.CiformPacketizer.prototype.encode = function( message )
 		It has first to be built with options to define the encryption ;
 		then one of its method must be called on the element to encrypt.
 	@constructor
-	@param {Object} options (optional) (and next arguments) (optional)
+	@param {Object} options (optional) (and next arguments)
 		Overrides the default properties and functions of this object.<br>
-		For instance, pass <code>{'encoder':myencoder,'onerror':function(e,context){dosomething()}}</code> to this constructor
-		to provide it your custom encoder and a custom error handler.
+		For instance, provide <code>{'encoder':myencoder,'onerror':function(e,context){dosomething()}}</code>
+		to use a custom encoder and a custom error handler.
 */
 Ciform.Cipher = function( options )
 {

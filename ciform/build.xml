@@ -37,13 +37,13 @@
         <tempfile property="build.bigsource.js" destDir="${build.dir}" prefix="lib${ant.project.name}" suffix=".js" />
         <!-- TODO handle encoding (and eol?) -->
         <concat destfile="${build.bigsource.js}">
-            <!-- order is important because of function dependencies -->
-            <!-- TODO no direct reference to the directory where dependencies are stored -->
+            <!-- Order is important because of function dependencies -->
+            <!-- TODO no direct reference to the directory where dependencies are stored : use Ivy to order them accordingly to dependency priorities -->
             <fileset dir="${build.dir}/ivy/source">
+                <include name="rsa*.js" />
                 <include name="hex*.js" />
                 <include name="base64*.js" />
                 <include name="sha1*.js" />
-                <include name="rsa*.js" />
                 <include name="minilib.js" />
             </fileset>
             <fileset dir="${src.dir}" includes="*.js" />

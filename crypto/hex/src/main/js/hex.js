@@ -7,7 +7,7 @@
 /** @namespace */
 Crypto = typeof Crypto != 'undefined' ? Crypto : {};
 /** @namespace */
-Crypto.Hex = (function(/*window, undefined, $*/) {
+Crypto.Hex = (function(bs,bm) {
 
 //
 // START OF ORIGINAL CODE
@@ -100,4 +100,4 @@ return {
     hex2s: hex2s
 };
 
-})(/*window, undefined, $*/);
+})(bs, bm);

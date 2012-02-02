@@ -16,6 +16,6 @@
         <artifact name="hex-min" type="js" conf="minified"/>
     </publications>
     <dependencies>
-        <!-- no dependency required -->
+        <dependency org="nicommons.crypto" name="rsa" rev="latest.integration" conf="*->source" />
     </dependencies>
 </ivy-module>
