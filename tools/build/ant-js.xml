@@ -31,84 +31,58 @@
 
 
     <!--
-        Main targets : they are greatly inspired from the Maven build lifecycle
+        Main phases : they are greatly inspired from the Maven build lifecycle
         See http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Lifecycle_Reference
     -->
 
-    <target name="validate" description="Validates the project is correct and all necessary information is available.">
-        <!-- Retrieves dependencies with ivy : required to initialize the cache and to get informations about the module being built -->
-    	<ivy:retrieve pattern="${build.dir}/ivy/[conf]/[artifact].[ext]" />
-        <!-- Creates required directories -->
-        <mkdir dir="${target.dir}" />
-    </target>
+    <extension-point name="validate" description="Validates the project is correct and all necessary information is available." />
 
-    <extension-point name="compile" depends="validate" description="Compiles the source code of the project.">
-        <!-- We use this target to copy all required files for the tests together in a consistent hierarchy -->
-        <!--
-        <copy file="${jsunit.coreJs}" todir="${jsunit.tmp}"/>
-        <copy todir="${jsunit.tmp}" overwrite="true">
-            <resources refid="jsunit.in.files"/>
-        </copy>
-        -->
-        <!-- nothing more to do -->
-    </extension-point>
+    <extension-point name="compile" depends="validate" description="Compiles the source code of the project." />
 
     <extension-point name="test" depends="compile" description="Tests the compiled source code using a suitable unit testing framework. These tests should not require the code be packaged or deployed." />
 
-    <extension-point name="package" depends="build-default, build-minified, test" description="Takes the compiled code and package it in its distributable format, such as a JAR." />
+    <extension-point name="package" depends="test" description="Takes the compiled code and package it in its distributable format, such as a JAR." />
 
-    <target name="integration-test" depends="package" description="Processes and deploys the package if necessary into an environment where integration tests can be run.">
-
-        <!-- Testing the compressed version of the library -->
-
-        <!-- Replaces the tested library with the compressed version -->
-        <!-- FIXME : it's not clean : it should not override a file already in build.dir -->
-        <!--
-        <copy file="${target.dir}/${ant.project.name}-compressed-${ivy.revision}.js" tofile="${build.dir}/sha1.js"/>
-        -->
-
-        <!--
-        <resources id="jsunit.in.files">
-            <file file="${build.dir}/sha1.js"/>
-            <fileset dir="${tests.dir}"/>
-        </resources>
-        -->
-
-        <!--
-        <antcall target="jsunit">
-            <reference refid="jsunit.in.files"/>
-            <param name="jsunit.in.testsuite" value="AllTests.html"/>
-            <param name="jsunit.out.logs" value="${tests.logs}"/>
-        </antcall>
-        -->
-        <!-- nothing more to do -->
-    </target>
+    <extension-point name="integration-test" depends="package" description="Processes and deploys the package if necessary into an environment where integration tests can be run." />
 
     <extension-point name="verify" depends="integration-test" description="Runs any checks to verify the package is valid and meets quality criteria." />
 
-    <target name="install" depends="build-default, build-minified, test" description="Installs the package into the local repository, for use as a dependency in other projects locally.">
-        <!-- 'local' resolver is a default one bundled with Ivy -->
-        <!-- 'artifactspattern' must match the name of the files this script builds -->
-        <ivy:publish resolver="local" artifactspattern="${target.lib.dir}/[artifact]-[revision].[ext]" overwrite="true" forcedeliver="true" />
-    </target>
+    <extension-point name="install" description="Installs the package into the local repository, for use as a dependency in other projects locally." />
 
     <extension-point name="deploy" depends="verify" description="Done in an integration or release environment, copies the final package to the remote repository for sharing with other developers and projects." />
 
-    <target name="clean" description="Restores the initial state of the project, deleting any generated file.">
-        <delete includeemptydirs="true" failonerror="false">
-            <fileset dir="${build.dir}" />
-            <fileset dir="${target.dir}" />
-        </delete>
-    </target>
+    <extension-point name="clean" description="Restores the initial state of the project, deleting any generated file." />
 
-    <extension-point name="site" depends="site-doc" description="Generates site (developer) documentation for this project." />
+    <extension-point name="site" description="Generates site documentation for this project." />
 
 
     <!--
         Some more specific targets
     -->
 
-    <target name="site-doc" depends="validate" description="Generates site (developer) documentation for this project.">
+    <target name="make-validate" extensionOf="validate" description="Validates the project is correct and all necessary information is available.">
+        <!-- Retrieves dependencies with ivy : required to initialize the cache and to get informations about the module being built -->
+        <!-- We use the default pattern, but put the resolved artifacts in a directory of ours so we can delete it afterwards -->
+    	<ivy:retrieve pattern="${build.dir}/ivy/[conf]/[artifact].[ext]" sync="true" />
+        <!-- Creates required directories -->
+        <mkdir dir="${target.dir}" />
+    </target>
+
+    <target name="ivy-install" extensionOf="install" depends="validate" description="Builds and installs the artifacts into the local Ivy repository.">
+        <!-- 'local' resolver is a default one bundled with Ivy ; it resides in the user's home directory -->
+        <!-- 'artifactspattern' must match the name of the files this script builds -->
+        <!-- Note : We use all options to force overwriting of existing (and possibly deprecated, during development) files -->
+        <ivy:publish resolver="local" artifactspattern="${target.lib.dir}/[artifact].[ext]" overwrite="true" forcedeliver="true" publishivy="true" />
+    </target>
+
+    <target name="make-clean" extensionOf="clean" description="Deletes build and target directories">
+        <delete includeemptydirs="true" failonerror="false">
+            <fileset dir="${build.dir}" />
+            <fileset dir="${target.dir}" />
+        </delete>
+    </target>
+
+    <target name="doc" depends="validate" extensionOf="site" description="Generates API documentation for this project.">
 
         <!-- Generates a report of dependencies -->
         <ivy:report todir="${target.dir}/doc/ivy"/>
@@ -150,8 +124,8 @@
         <attribute name="module" default="${ivy.module}" />
         <attribute name="revision" default="${ivy.revision}" />
         <sequential>
-            <copy file="@{bigsource}" tofile="@{dir}/@{module}-@{revision}.js" />
-            <echo message="Copied : @{dir}/@{module}-@{revision}.js" />
+            <copy file="@{bigsource}" tofile="@{dir}/@{module}.js" />
+            <echo message="Copied : @{dir}/@{module}.js" />
         </sequential>
     </macrodef>
 
@@ -161,33 +135,67 @@
         <attribute name="module" default="${ivy.module}" />
         <attribute name="revision" default="${ivy.revision}" />
         <sequential>
-        <java jar="${yuicompressor.jar}" fork="true" output="@{dir}/@{module}-min-@{revision}.js" failonerror="true">
+        <java jar="${yuicompressor.jar}" fork="true" output="@{dir}/@{module}-min.js" failonerror="true">
             <arg line="--type js" />
             <arg file="@{bigsource}"/>
         </java>
-        <echo message="Minified : @{dir}/@{module}-min-@{revision}.js" />
+        <echo message="Minified : @{dir}/@{module}-min.js" />
         </sequential>
     </macrodef>
 
-    <target name="build-default" depends="build-bigsource" description="Builds the default .js.">
+    <target name="build-default" extensionOf="package" depends="build-bigsource" description="Builds the default .js.">
         <make-default bigsource="${build.bigsource.js}" />
     </target>
 
-    <target name="build-minified" depends="build-bigsource" description="Builds a minified version of the .js.">
+    <target name="build-minified" extensionOf="package" depends="build-bigsource" description="Builds a minified version of the .js.">
         <make-min bigsource="${build.bigsource.js}" />
     </target>
 
-    <target name="build-pom" extensionOf="package" depends="validate, install" description="Builds a Maven POM.">
+    <target name="build-pom" extensionOf="package" depends="validate" description="Builds a Maven POM.">
+        <!-- TODO Is 'pom.xml' a standard name for this file ? -->
         <ivy:makepom ivyfile="${basedir}/ivy.xml" pomfile="${target.dir}/pom.xml" />
-    </target>
-
-    <target name="make-deploy" extensionOf="deploy" depends="package" description="Deploys to the local 'publications' directory." >
-        <ivy:publish resolver="local" artifactspattern="${pub.dir}/[module]/[artifact]-[conf]-[revision].[ext]" overwrite="true" forcedeliver="true" />
     </target>
 
     <!--
         TODO fix and integrate the following targets
     -->
+
+    <target name="pre-test" extensionOf="test" description="Runs unit tests">
+       <!-- We use this target to copy all required files for the tests together in a consistent hierarchy -->
+        <!--
+        <copy file="${jsunit.coreJs}" todir="${jsunit.tmp}"/>
+        <copy todir="${jsunit.tmp}" overwrite="true">
+            <resources refid="jsunit.in.files"/>
+        </copy>
+        -->
+        <!-- nothing more to do -->
+    </target>
+
+    <target name="test-integration" extensionOf="integration-test" description="Runs integration tests" >
+        <!-- Testing the compressed version of the library -->
+
+        <!-- Replaces the tested library with the compressed version -->
+        <!-- FIXME : it's not clean : it should not override a file already in build.dir -->
+        <!--
+        <copy file="${target.dir}/${ant.project.name}-compressed-${ivy.revision}.js" tofile="${build.dir}/sha1.js"/>
+        -->
+
+        <!--
+        <resources id="jsunit.in.files">
+            <file file="${build.dir}/sha1.js"/>
+            <fileset dir="${tests.dir}"/>
+        </resources>
+        -->
+
+        <!--
+        <antcall target="jsunit">
+            <reference refid="jsunit.in.files"/>
+            <param name="jsunit.in.testsuite" value="AllTests.html"/>
+            <param name="jsunit.out.logs" value="${tests.logs}"/>
+        </antcall>
+        -->
+        <!-- nothing more to do -->
+    </target>
 
     <!--
         Runs JsUnit tests. This target saves a lot of verbosity in the projects' build scripts.

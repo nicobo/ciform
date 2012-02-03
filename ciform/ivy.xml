@@ -7,20 +7,22 @@
         </description>
     </info>
     <configurations>
-      <conf name="source" description="The library in clear, meaning visible source code and comments." />
-      <conf name="minified" description="An obfuscated, size-reduced version of the script. Use to speed up loading time in final environment. " />
+      <conf name="default" description="The library in clear, meaning visible source code and comments." />
+      <conf name="minified" description="An obfuscated, size-reduced version of the script. Use to speed up loading time in final environment." />
     </configurations>
     <publications>
       <!-- ciform core library -->
-      <artifact name="ciform" type="js" />
+      <artifact name="ciform" type="js" conf="default" />
+      <artifact name="ciform-min" type="js" conf="minified" />
       <!-- ciform and all dependencies in a single artifact -->
-      <artifact name="libciform" type="js" />
+      <artifact name="libciform" type="js" conf="default" />
+      <artifact name="libciform-min" type="js" conf="minified" />
     </publications>
     <dependencies>
-      <dependency org="nicommons.javascript" name="minilib" rev="latest.integration" conf="*->source" />
-      <dependency org="nicommons.crypto" name="hex" rev="latest.integration" conf="*->source" />
-      <dependency org="nicommons.crypto" name="base64" rev="latest.integration" conf="*->source" />
-      <dependency org="nicommons.crypto" name="sha1" rev="latest.integration" conf="*->source" />
-      <dependency org="nicommons.crypto" name="rsa" rev="latest.integration" conf="*->source" />
+      <dependency org="nicommons.javascript" name="minilib" rev="latest.integration" />
+      <dependency org="nicommons.crypto" name="hex" rev="latest.integration" conf="*->default" />
+      <dependency org="nicommons.crypto" name="base64" rev="latest.integration" conf="*->default" />
+      <dependency org="nicommons.crypto" name="sha1" rev="latest.integration" conf="*->default" />
+      <dependency org="nicommons.crypto" name="rsa" rev="latest.integration" conf="*->default" />
     </dependencies>
 </ivy-module>

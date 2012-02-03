@@ -6,16 +6,14 @@
         </description>
     </info>
     <configurations>
-      <!-- The source script as plain text, including all inner informations and comments. -->
-      <conf name="source"/>
-      <!-- An obfuscated, size-reduced version of the script. Use to speed up loading time in final environment. -->
-      <conf name="minified"/>
+      <conf name="default" description="The library in clear, meaning visible source code and comments." />
+      <conf name="minified" description="An obfuscated, size-reduced version of the script. Use to speed up loading time in final environment." />
     </configurations>
     <publications>
-        <artifact name="hex" type="js" conf="source"/>
+        <artifact name="hex" type="js" conf="default"/>
         <artifact name="hex-min" type="js" conf="minified"/>
     </publications>
     <dependencies>
-        <dependency org="nicommons.crypto" name="rsa" rev="latest.integration" conf="*->source" />
+        <dependency org="nicommons.crypto" name="rsa" rev="latest.integration" conf="*->default" />
     </dependencies>
 </ivy-module>

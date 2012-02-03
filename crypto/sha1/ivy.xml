@@ -1,20 +1,18 @@
 <ivy-module version="2.0">
     <info organisation="nicommons.crypto" module="sha1" revision="1.0.0" status="integration">
-        <license name="Copyright Paul Johnston 2000 - 2002" url="http://pajhome.org.uk/crypt/md5"/>
-        <license name="BSD License"/>
+        <license name="Copyright Paul Johnston 2000 - 2002" url="http://pajhome.org.uk/crypt/md5" />
+        <license name="BSD License" url="http://pajhome.org.uk/site/legal.html#bsdlicense"/>
         <ivyauthor name="Nicolas BONARDELLE" url="http://nicobo.net/contact?subject=crypto+base64+ivy"/>
         <description homepage="http://ciform.googlecode.com">
             A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined in FIPS PUB 180-1
         </description>
     </info>
     <configurations>
-      <!-- The source script as plain text, including all inner informations and comments. -->
-      <conf name="source"/>
-      <!-- An obfuscated, size-reduced version of the script. Use to speed up loading time in final environment. -->
-      <conf name="minified"/>
+      <conf name="default" description="The library in clear, meaning visible source code and comments." />
+      <conf name="minified" description="An obfuscated, size-reduced version of the script. Use to speed up loading time in final environment." />
     </configurations>
     <publications>
-        <artifact name="sha1" type="js" conf="source"/>
+        <artifact name="sha1" type="js" conf="default"/>
         <artifact name="sha1-min" type="js" conf="minified"/>
     </publications>
     <dependencies>
