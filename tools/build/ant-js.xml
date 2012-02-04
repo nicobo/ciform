@@ -156,6 +156,27 @@
         <ivy:makepom ivyfile="${basedir}/ivy.xml" pomfile="${target.dir}/pom.xml" />
     </target>
 
+    <target name="build-site" extensionOf="deploy" depends="validate" description="Builds a local directory that will reflect the structure of the final site with Ivy and Maven repositories as well as online API docs" >
+        <!-- First, creates an Ivy repo -->
+        <ivy:settings id="ivy.repo.site" file="${ivy.settings.path}" />
+        <ivy:install organisation="nicommons.crypto" module="base64" revision="1.0.0" settingsRef="ivy.repo.site" from="target" to="site" transitive="true" />
+        <!-- Then add supplementary files -->
+        <copy todir="${pub.dir}/${ivy.organisation}/${ivy.module}/${ivy.revision}">
+            <fileset dir="${basedir}">
+                <include name="*.txt" />
+            </fileset>
+            <fileset dir="${build.dir}">
+                <include name="pom.xml" />
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="clean-site" description="Deletes the local site built with 'buils-site'">
+        <delete includeemptydirs="true" failonerror="false">
+            <fileset dir="${pub.dir}" />
+        </delete>
+    </target>
+
     <!--
         TODO fix and integrate the following targets
     -->
