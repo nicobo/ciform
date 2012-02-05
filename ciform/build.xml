@@ -65,6 +65,7 @@
             <fileset dir="../crypto" includes="**/build.xml"/>
             <fileset dir="../minilib" includes="**/build.xml"/>
         </ivy:buildlist>
+        <echo level="verbose" message="build.lib.ants=${toString:build.lib.ants}" />
     </target>
 
     <target name="install-all" depends="resolve-dependencies" description="Builds all dependent projects and installs their artifacts into the local Ivy repo.">
@@ -72,6 +73,13 @@
         <subant buildpathref="build.lib.ants">
             <target name="package" />
             <target name="install" />
+        </subant>
+    </target>
+
+    <target name="deploy-all" depends="resolve-dependencies, clean-site, install-all" description="Deploys all dependent projects.">
+        <!-- executes the build script on each dependent module -->
+        <subant buildpathref="build.lib.ants">
+            <target name="deploy" />
         </subant>
     </target>
 

@@ -76,10 +76,9 @@
     </target>
 
     <target name="make-clean" extensionOf="clean" description="Deletes build and target directories">
-        <delete includeemptydirs="true" failonerror="false">
-            <fileset dir="${build.dir}" />
-            <fileset dir="${target.dir}" />
-        </delete>
+        <!-- NOTE 'dir' attribute is more efficient at deleting dirs than nested <fileset dir='...' /> -->
+        <delete dir="${build.dir}" deleteonexit="true" failonerror="false" />
+        <delete dir="${target.dir}" deleteonexit="true" failonerror="false" />
     </target>
 
     <target name="doc" depends="validate" extensionOf="site" description="Generates API documentation for this project.">
@@ -151,30 +150,38 @@
         <make-min bigsource="${build.bigsource.js}" />
     </target>
 
+    <!-- TODO Works but misses minified artifact amongst other things ; see http://ant.1045680.n5.nabble.com/Review-Needed-for-quot-Publishing-Maven-Artifacts-with-Ivy-quot-Doc-td3204659.html -->
     <target name="build-pom" extensionOf="package" depends="validate" description="Builds a Maven POM.">
-        <!-- TODO Is 'pom.xml' a standard name for this file ? -->
-        <ivy:makepom ivyfile="${basedir}/ivy.xml" pomfile="${target.dir}/pom.xml" />
+        <ivy:makepom ivyfile="${basedir}/ivy.xml" pomfile="${target.dir}/${ivy.module}.pom">
+            <mapping conf="default" scope="test"/>
+            <mapping conf="minified" scope="compile"/>
+        </ivy:makepom>
     </target>
 
-    <target name="build-site" extensionOf="deploy" depends="validate" description="Builds a local directory that will reflect the structure of the final site with Ivy and Maven repositories as well as online API docs" >
+    <target name="build-site" extensionOf="deploy" depends="site" description="Builds a local directory that will reflect the structure of the final site with Ivy and Maven repositories as well as online API docs" >
         <!-- First, creates an Ivy repo -->
         <ivy:settings id="ivy.repo.site" file="${ivy.settings.path}" />
-        <ivy:install organisation="nicommons.crypto" module="base64" revision="1.0.0" settingsRef="ivy.repo.site" from="target" to="site" transitive="true" />
+        <!-- Note : transitive=false so we need to 'deploy' each project -->
+        <!-- Note : overwrite=true because it's easier during development -->
+        <ivy:install organisation="${ivy.organisation}" module="${ivy.module}" revision="${ivy.revision}" settingsRef="ivy.repo.site" from="target" to="site" overwrite="true" />
         <!-- Then add supplementary files -->
         <copy todir="${pub.dir}/${ivy.organisation}/${ivy.module}/${ivy.revision}">
             <fileset dir="${basedir}">
                 <include name="*.txt" />
             </fileset>
-            <fileset dir="${build.dir}">
-                <include name="pom.xml" />
+            <!-- TODO copy pom
+            <fileset dir="${target.dir}">
+                <include name="*.pom" />
             </fileset>
+            -->
+        </copy>
+        <copy todir="${pub.dir}/${ivy.organisation}/${ivy.module}/${ivy.revision}/doc/api/js">
+            <fileset dir="${target.dir}/doc/api/js" />
         </copy>
     </target>
 
     <target name="clean-site" description="Deletes the local site built with 'buils-site'">
-        <delete includeemptydirs="true" failonerror="false">
-            <fileset dir="${pub.dir}" />
-        </delete>
+        <delete dir="${pub.dir}" includeemptydirs="true" deleteonexit="true" failonerror="false" />
     </target>
 
     <!--

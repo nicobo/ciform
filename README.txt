@@ -30,7 +30,7 @@ The build scripts will generate files in a given <publications> directory :
     /ciform/<version>/LICENSE.txt            Project's license
     /ciform/<version>/NOTICE.txt             Notices and attributions required by libraries that the project depends on
     /ciform/<version>/ivy.xml                Ivy project descriptor
-    /ciform/<version>/pom.xml                Maven project descriptor
+    /ciform/<version>/<module>.pom           Maven project descriptor
     /ciform/<version>/ciform.js              Source library
     /ciform/<version>/ciform-min.js          Minified source library
     /ciform/<version>/libciform.js           Standalone library

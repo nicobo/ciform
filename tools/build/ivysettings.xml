@@ -1,12 +1,13 @@
 <ivysettings>
+    <settings defaultResolver="target" />
     <resolvers>
         <filesystem name="target">
-            <ivy pattern="${basedir}/ivy(-[revision]).xml"/>
-            <artifact pattern="${target.lib.dir}/[artifact](-[revision]).[ext]"/>
+            <ivy pattern="${basedir}/ivy.xml"/>
+            <artifact pattern="${target.lib.dir}/[artifact].[ext]"/>
         </filesystem>
         <filesystem name="site">
-            <ivy pattern="${pub.dir}/[organisation]/[module]/ivys/ivy(-[revision]).xml"/>
-            <artifact pattern="${pub.dir}/[organisation]/[module]/[type]s/[artifact]-[revision].[ext]"/>
+            <ivy pattern="${pub.dir}/[organisation]/[module]/[revision]/ivy.xml"/>
+            <artifact pattern="${pub.dir}/[organisation]/[module]/[revision]/[artifact].[ext]"/>
         </filesystem>
     </resolvers>
 </ivysettings>
