@@ -1,5 +1,5 @@
 <ivy-module version="2.0">
-    <info organisation="nicommons.javascript" module="minilib" revision="1.0.0" status="integration">
+    <info organisation="nicommons.javascript" module="minilib" revision="1.0-SNAPSHOT" status="integration">
         <license name="BSD simplified" url="http://www.opensource.org/licenses/BSD-2-Clause"/>
         <ivyauthor name="Nicolas BONARDELLE" url="http://nicobo.net/contact?subject=minilib+ivy"/>
         <description homepage="http://ciform.googlecode.com">

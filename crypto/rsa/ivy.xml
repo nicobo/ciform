@@ -1,5 +1,5 @@
 <ivy-module version="2.0">
-    <info organisation="nicommons.crypto" module="rsa" revision="1.0.0" status="integration">
+    <info organisation="nicommons.crypto" module="rsa" revision="1.0-SNAPSHOT" status="integration">
         <license name="Copyright 2000 by John M Hanna" url="http://sourceforge.net/projects/shop-js"/>
         <license name="GNU General Public License (GPL)" url="http://www.gnu.org/copyleft/gpl.html"/>
         <ivyauthor name="Nicolas BONARDELLE" url="http://nicobo.net/contact?subject=crypto+rsa+ivy"/>
