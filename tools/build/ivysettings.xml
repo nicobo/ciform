@@ -1,10 +1,12 @@
 <ivysettings>
     <settings defaultResolver="target" />
     <resolvers>
+        <!-- The local 'target' directory where artifacts are generated -->
         <filesystem name="target">
             <ivy pattern="${basedir}/ivy.xml"/>
             <artifact pattern="${target.lib.dir}/[artifact].[ext]"/>
         </filesystem>
+        <!-- Used to publish artifacts to a local repository exportable to the web -->
         <filesystem name="site">
             <ivy pattern="${pub.dir}/[organisation]/[module]/[revision]/ivy.xml"/>
             <artifact pattern="${pub.dir}/[organisation]/[module]/[revision]/[artifact].[ext]"/>

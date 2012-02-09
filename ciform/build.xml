@@ -33,6 +33,7 @@
         </exec>
     </target>
 
+    <!-- TODO Récupérer les dépendances pour les ajouter à biglib et déplacer vers ant-js.xml -->
     <target name="build-biglib" depends="validate" description="Builds the bigsource file to work with for the 'lib' artifact" >
         <tempfile property="build.bigsource.js" destDir="${build.dir}" prefix="lib${ant.project.name}" suffix=".js" />
         <!-- TODO handle encoding (and eol?) -->
@@ -52,11 +53,11 @@
     </target>
 
     <target name="build-libdefault" extensionOf="package" depends="build-biglib" description="Builds the default .js.">
-        <make-default bigsource="${build.bigsource.js}" module="libciform" />
+        <build-default bigsource="${build.bigsource.js}" module="libciform" />
     </target>
 
     <target name="build-libmin" extensionOf="package" depends="build-biglib" description="Builds a minified version of the .js.">
-        <make-min bigsource="${build.bigsource.js}" module="libciform" />
+        <build-minified bigsource="${build.bigsource.js}" module="libciform" />
     </target>
 
     <target name="resolve-dependencies" description="(internal) Builds an ordered list of dependent modules." >

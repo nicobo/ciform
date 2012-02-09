@@ -53,11 +53,11 @@
 
     <extension-point name="clean" description="Restores the initial state of the project, deleting any generated file." />
 
-    <extension-point name="site" description="Generates site documentation for this project." />
+    <extension-point name="site" depends="package" description="Generates site documentation for this project. This also includes snapshot releases in Ivy repository style." />
 
 
     <!--
-        Some more specific targets
+        Targets that implement "phases" (extension points)
     -->
 
     <target name="make-validate" extensionOf="validate" description="Validates the project is correct and all necessary information is available.">
@@ -90,7 +90,9 @@
         <java jar="${jsdoc.dir}/jsrun.jar" fork="true" failonerror="true">
             <arg file="${jsdoc.dir}/app/run.js" />
             <arg file="${src.dir}"/>
-            <arg prefix="--template=" file="${jsdoc.dir}/templates/jsdoc" />
+            <arg prefix="--template=" file="${jsdoc.template.dir}" />
+            <arg prefix="--define=" value="projectName:${ant.project.name}" />
+            <arg prefix="--define=" value="license:${project.license}" />
             <arg value="--allfunctions" />
             <arg value="--private" />
             <arg prefix="--directory=" file="${target.dir}/doc/api/js"/>
@@ -117,37 +119,46 @@
         <echo message="Created : ${build.bigsource.js}" level="verbose" />
     </target>
 
-    <macrodef name="make-default" description="Builds the default .js.">
-        <attribute name="bigsource" />
-        <attribute name="dir" default="${target.lib.dir}" />
-        <attribute name="module" default="${ivy.module}" />
-        <attribute name="revision" default="${ivy.revision}" />
+    <macrodef name="minify" description="Builds a minified version of the .js.">
+        <attribute name="file" />
+        <attribute name="tofile" />
         <sequential>
-            <copy file="@{bigsource}" tofile="@{dir}/@{module}.js" />
-            <echo message="Copied : @{dir}/@{module}.js" />
+            <java jar="${yuicompressor.jar}" fork="true" output="@{tofile}" failonerror="true">
+                <arg line="--type js" />
+                <arg file="@{file}"/>
+            </java>
+            <echo message="Minified : @{tofile}" level="verbose" />
         </sequential>
     </macrodef>
 
-    <macrodef name="make-min" description="Builds a minified version of the .js.">
+    <macrodef name="build-default" description="Builds the default .js.">
         <attribute name="bigsource" />
-        <attribute name="dir" default="${target.lib.dir}" />
         <attribute name="module" default="${ivy.module}" />
-        <attribute name="revision" default="${ivy.revision}" />
         <sequential>
-        <java jar="${yuicompressor.jar}" fork="true" output="@{dir}/@{module}-min.js" failonerror="true">
-            <arg line="--type js" />
-            <arg file="@{bigsource}"/>
-        </java>
-        <echo message="Minified : @{dir}/@{module}-min.js" />
+            <local name="file" />
+            <property name="file" value="${target.lib.dir}/@{module}.js" />
+            <copy file="@{bigsource}" tofile="${file}" />
+            <echo message="Built : ${file}" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="build-minified" description="Builds a minified version of the .js.">
+        <attribute name="bigsource" />
+        <attribute name="module" default="${ivy.module}" />
+        <sequential>
+            <local name="file" />
+            <property name="file" value="${target.lib.dir}/@{module}-min.js" />
+            <minify file="@{bigsource}" tofile="${file}" />
+            <echo message="Built (minified) : ${file}" />
         </sequential>
     </macrodef>
 
     <target name="build-default" extensionOf="package" depends="build-bigsource" description="Builds the default .js.">
-        <make-default bigsource="${build.bigsource.js}" />
+        <build-default bigsource="${build.bigsource.js}" />
     </target>
 
     <target name="build-minified" extensionOf="package" depends="build-bigsource" description="Builds a minified version of the .js.">
-        <make-min bigsource="${build.bigsource.js}" />
+        <build-minified bigsource="${build.bigsource.js}" />
     </target>
 
     <!-- TODO Works but misses minified artifact amongst other things ; see http://ant.1045680.n5.nabble.com/Review-Needed-for-quot-Publishing-Maven-Artifacts-with-Ivy-quot-Doc-td3204659.html -->
@@ -158,14 +169,15 @@
         </ivy:makepom>
     </target>
 
-    <target name="build-site" extensionOf="deploy" depends="site" description="Builds a local directory that will reflect the structure of the final site with Ivy and Maven repositories as well as online API docs" >
+    <target name="hg-site" extensionOf="deploy" depends="site" description="Builds a local directory that will reflect the structure of the final site with Ivy and Maven repositories as well as online API docs" >
         <!-- First, creates an Ivy repo -->
         <ivy:settings id="ivy.repo.site" file="${ivy.settings.path}" />
         <!-- Note : transitive=false so we need to 'deploy' each project -->
         <!-- Note : overwrite=true because it's easier during development -->
+        <!-- Example of final URL once tagged : http://ciform.googlecode.com/hg-history/1.0-SNAPSHOT/publications/nicommons/javascript/ivy.xml -->
         <ivy:install organisation="${ivy.organisation}" module="${ivy.module}" revision="${ivy.revision}" settingsRef="ivy.repo.site" from="target" to="site" overwrite="true" />
         <!-- Then add supplementary files -->
-        <copy todir="${pub.dir}/${ivy.organisation}/${ivy.module}/${ivy.revision}">
+        <copy todir="${pub.dir}/${ivy.organisation}/${ivy.module}">
             <fileset dir="${basedir}">
                 <include name="*.txt" />
             </fileset>
@@ -175,7 +187,7 @@
             </fileset>
             -->
         </copy>
-        <copy todir="${pub.dir}/${ivy.organisation}/${ivy.module}/${ivy.revision}/doc/api/js">
+        <copy todir="${pub.dir}/${ivy.organisation}/${ivy.module}/doc/api/js">
             <fileset dir="${target.dir}/doc/api/js" />
         </copy>
     </target>
@@ -184,9 +196,50 @@
         <delete dir="${pub.dir}" includeemptydirs="true" deleteonexit="true" failonerror="false" />
     </target>
 
+    <!-- TEST ; not quite useful -->
+    <target name="ant2dot" description="(internal)" >
+
+        <!-- STEP 1: set some ANT properties -->
+        <property name="build.xml" value="${tools.dir}/build/ant-js.xml"/><!-- ie. this ANT script -->
+        <property name="ant2dot.xsl" value="${tools.dir}/build/ant2dot.xsl"/><!-- the stylesheet -->
+        <basename property="basename.script" file="${build.xml}" suffix=".xml"/>
+        <property name="dot.file" value="${build.dir}/${basename.script}.dot"/>
+        <property name="png.file" value="${target.dir}/${basename.script}.png"/>
+
+        <!-- STEP 2: generate the DOT file ("build.dot" or something similar) -->
+        <xslt in="${build.xml}" out="${dot.file}" style="${ant2dot.xsl}" force="true" />
+
+        <!-- STEP 3: generate the PNG file ("build.png" or something similar) -->
+        <exec executable="${tools.dir}/graphviz/bin/dot.exe">
+            <arg value="-Tpng"/>
+                <arg file="${dot.file}"/>
+            <arg value="-o"/>
+                <arg file="${png.file}"/>
+        </exec>
+
+    </target>
+
+    <!-- TEST ; not quite useful -->
+    <!--
+    <taskdef name="vizant" classname="net.sourceforge.vizant.Vizant" classpath="${tools.dir}/vizant-0.1.2.jar" description="(internal)" />
+    <target name="vizant">
+        <vizant antfile="${ant.file}" outfile="${build.dir}/build.dot"/>
+        <exec executable="${tools.dir}/graphviz/bin/dot.exe" >
+            <arg line="-Tpng"/>
+                <arg file="${build.dir}/build.dot"/>
+            <arg value="-o"/>
+                <arg file="${target.dir}/build.png"/>
+        </exec>
+    </target>
+    -->
+
     <!--
         TODO fix and integrate the following targets
     -->
+
+    <target name="googlecode-upload" extensionOf="deploy" description="Uploads versionned artifacts to googlecode" >
+        <!-- TODO -->
+    </target>
 
     <target name="pre-test" extensionOf="test" description="Runs unit tests">
        <!-- We use this target to copy all required files for the tests together in a consistent hierarchy -->
@@ -276,7 +329,7 @@
     </target>
 
     <!-- Generates developer documentation using (old) jsdoc. -->
-    <target name="jsdoc" depends="validate">
+    <target name="old-jsdoc" depends="validate">
 
         <!-- Generates a report of dependencies -->
         <ivy:report todir="${target.dir}/doc/ivy"/>
@@ -292,7 +345,6 @@
             <arg line="--project-name Crypto.SHA1"/>
             <arg value="${src.dir}"/>
         </exec>
-
     </target>
 
 </project>

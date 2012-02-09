@@ -1,10 +1,6 @@
-//////////////////////////////////////////////////////////////////////////////////
-//
-// minilib.js
-//
-// Copyright © 2008 Nicolas BONARDELLE <http://nicobo.net/contact>
-//
-
+/*!
+	Copyright (c) 2008 Nicolas BONARDELLE <http://nicobo.net/contact>
+*/
 
 
 /**
