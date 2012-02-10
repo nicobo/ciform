@@ -38,7 +38,7 @@
  * ...
  * &lt;/HEAD&gt;
  * ...
- * &lt;FORM action="http://myserver/mypage.php" onsubmit="javascript:mycipher.encryptForm(this,{'allowTypes':"password"});"&gt;
+ * &lt;FORM action="http://myserver/mypage.php" onsubmit="mycipher.encryptForm(this,{'allowTypes':"password"});"&gt;
  * ...
  *	</pre></code>
  *
@@ -84,11 +84,6 @@
 		<p>NOTE : The first letter is in upper case mainly to prevent errors like using 'ciform' to name a variable,
 		and because it should also be considered as an Object containing the definitions of this library.<br>
 		It is not very clean since other namespaces are named with lower case characters, but there's currently no perfect solution in Javascript.</p>
-
-	@requires http://www.hanewin.net/encrypt/rsa/base64.js
-	@requires http://www.hanewin.net/encrypt/rsa/hex.js
-	@requires http://pajhome.org.uk/crypt/md5/sha1.js
-	@requires http://www.hanewin.net/encrypt/rsa/rsa.js
 */
 Ciform = {};
 
@@ -137,7 +132,7 @@ Ciform.protocol.PACKET_PREFIX = "ciform:";
 	@param {HTMLFormElement} target
 		The element to encrypt.<br>
 		As an alternative, this parameter can be ignored if the input field is given in the options.
-	@param {Object} options (optional)
+	@param {Object} [options]
 		Overrides the properties of this object.
 	@constructor
 */
@@ -162,7 +157,7 @@ Ciform.Field = function( target, options )
 	/**
 		Output field : the field where to write the encoded text into.
 		Must have a writeable <em>value</em> property.
-		Defaults to {@link #in}.
+		@default <a href="#input">input</a>
 		@type HTMLElement
 	*/
 	this.output = $defined(options['output']) ? options['output'] : this['input'];
@@ -172,7 +167,7 @@ Ciform.Field = function( target, options )
 		<li>If == 1, indicates that this field should be SHA1-encoded before encryption.
 		<li>If == 2, meta-data will also be prepended to the result.
 		</ul>
-		DEFAULT : 0 (do not use SHA-1 at all)
+		@default 0 (do not use SHA-1 at all)
 		@type Integer
 	*/
 	this.sha1 = $defined(options['sha1']) ? options['sha1'] : 0;
@@ -182,15 +177,15 @@ Ciform.Field = function( target, options )
 	//
 
 	/**
-		@private
 		Takes the value of the encrypted text on encryption.
+		@private
 	*/
 	this._ciphertext = null;
 
 	/**
-		@private
 		Applies the encryption value stored in {@link #_ciphertext} to the output field
 		and clears the input field so it is not transmitted in clear if it's different from the output one.
+		@private
 	*/
 	this._commit = function()
 	{
@@ -265,7 +260,7 @@ Ciform.ciphers.SHA1Encoder = function( options )
 
 	/**
 		If true, meta-data will be prepended to the result of encryption.
-		<p>DEFAULT : false</p>
+		@default false
 		@type boolean
 	*/
 	this.preamble = false;
@@ -330,7 +325,7 @@ Ciform.ciphers.RSAPublicKey = function()
 /**
 	@class This encoder can encrypt a message given a public key.
 		The ciphertext may be decrypted only with the corresponding private key.
-		@see http://en.wikipedia.org/wiki/RSA.
+		@see http://en.wikipedia.org/wiki/RSA
 	@param {Object} options	Overrides the fields of this object. Must contain at least 'pubKey'.
 	@throws TypeError if the public key was not given or is not correct
 	@constructor
@@ -346,8 +341,8 @@ Ciform.ciphers.RSAEncoder = function( options )
 
 	/**
 		<p>If true, meta-data will be prepended to the result of encryption.</p>
-		<p>DEFAULT : false : don't add meta-data in the beginning of the ciphertext.</p>
 		@type boolean
+		@default false : don't put meta-data at the beginning of the ciphertext.
 	*/
 	this.preamble = false;
 
@@ -355,16 +350,16 @@ Ciform.ciphers.RSAEncoder = function( options )
 		<p>If true, a random string will be prepended to the text before encryption,
 		in order to make the ciphertext different every time, even with the same original text.<br>
 		E.g. "1234:my message" : "1234:" is the salt</p>
-		<p>DEFAULT : false : don't add salt in the beginning of the ciphertext</p>
 		<p><b>WARNING</b> : without salt, the same message encoded with the same key will always give the same ciphertext
 			(this could be a security issue).</p>
 		@type boolean
+		@default false : don't put salt at the beginning of the ciphertext.
 	*/
 	this.salt = false;
 
 	/**
 		<p>If true, does not check that the padding scheme is correct (does not apply if salt is added).</p>
-		<p>DEFAULT : false : do check that the padding scheme is correct (does not apply if salt is added).</p>
+		@default false : do check that the padding scheme is correct (does not apply if salt is added).
 		@type boolean
 	*/
 	this.noPadding = false;
@@ -413,7 +408,7 @@ Ciform.ciphers.RSAEncoder.prototype._getMPI = function()
 
 /**
 	@private
-	@return a random number between this.SALT_MIN and this.SALT_MAX
+	@return a random number between {@link #SALT_MIN} and {@link #SALT_MAX}
 	@type Number
 */
 Ciform.ciphers.RSAEncoder.prototype._getSalt = function()
@@ -549,7 +544,7 @@ Ciform.ciphers.CiformPacketizer.prototype = new Ciform.ciphers.Encoder();
 
 
 /**
-	Adds {@link Ciform.protocol#PACKET_PREFIX} to the message, if necessary.
+	Adds {@link Ciform.protocol.PACKET_PREFIX} to the message, if necessary.
 */
 Ciform.ciphers.CiformPacketizer.prototype.encode = function( message )
 {
@@ -570,7 +565,7 @@ Ciform.ciphers.CiformPacketizer.prototype.encode = function( message )
 		It has first to be built with options to define the encryption ;
 		then one of its method must be called on the element to encrypt.
 	@constructor
-	@param {Object} options (optional) (and next arguments)
+	@param {Object} [options](and next arguments)
 		Overrides the default properties and functions of this object.<br>
 		For instance, provide <code>{'encoder':myencoder,'onerror':function(e,context){dosomething()}}</code>
 		to use a custom encoder and a custom error handler.
@@ -584,9 +579,9 @@ Ciform.Cipher = function( options )
 	//
 
 	/**
-		<p>The encoder to use on each of the {@link #targets}</p>
-		<p>Default : a {@link Ciform.ciphers.RSAEncoder} inside a {@link Ciform.ciphers.CiformPacketizer} <b>if at least the <code>pubKey</code> property is provided in the options</b></p>
+		The encoder to use on each of the {@link #targets}
 		@type Ciform.ciphers.Encoder
+		@default A {@link Ciform.ciphers.RSAEncoder} inside a {@link Ciform.ciphers.CiformPacketizer} <b>if at least the <code>pubKey</code> property is provided in the options</b>
 	*/
 	this.encoder = null;
 
@@ -598,11 +593,10 @@ Ciform.Cipher = function( options )
 	/**
 		A custom error handler that will be called with the error as an argument during encryption operations.<br>
 
-		<p>Default function will log the error and pass it to the upper error handler.</p>
-
 		@param {Error} e the error that happened
 		@param {Object} context any information about the context, in the form of an object with properties
 		@type function
+		@default Default function will log the error and pass it to the upper error handler.
 	*/
 	this.onerror = function(e,context)
 	{
@@ -619,8 +613,8 @@ Ciform.Cipher = function( options )
 		<p>This default implementation does nothing.
 		It should be overridden to match specific needs.</p>
 	
-		@param target	The object that's going to be encrypted
-		@param options	(optional) The parameters of the current context, if any
+		@param target		The object that's going to be encrypted
+		@param [options]	The parameters of the current context, if any
 	*/
 	this.onEncryptionStart = function( target, options )
 	{
@@ -635,8 +629,8 @@ Ciform.Cipher = function( options )
 		<p>This default implementation does nothing.
 		It should be overridden to match specific needs.</p>
 	
-		@param target	The object that has just been be encrypted
-		@param options	(optional) The parameters of the current context, if any
+		@param target		The object that has just been be encrypted
+		@param [options]	The parameters of the current context, if any
 	*/
 	this.onEncryptionEnd = function( target, options )
 	{
@@ -679,7 +673,7 @@ Ciform.Cipher = function( options )
 	@param {String} text
 		The message to encode (will also be made 'ciform-encoded' using a {@link Ciform.ciphers.CiformPacketizer}).<br>
 		As an alternative, this parameter can be ignored if the text is given in the options.
-	@param {Object} options (optional)
+	@param {Object} [options]
 		An object with the following properties :
 		<ul>
 		<li><code>&lt;{@link String}&gt; text</code> -
@@ -730,30 +724,29 @@ Ciform.Cipher.prototype.encryptText = function( text, options )
 /**
 	Encrypts an HTML field.<br>
 
-	@param {HTMLElement} target
+	<p>Example 1 : <code>encryptField(myField);</code></p>
+	<p>Example 2 : <code>var result = encryptField(myField,{'commit':false});</code></p>
+	<p>Example 3 : <code>var result = encryptField({'field':myField,'commit':false});</code></p>
+
+	@param {HTMLElement|Object} target
 		The element to encrypt.<br>
-		As an alternative, this parameter can be ignored if the element is given in the options.
-	@param {Object} options (optional)
-		An object with the following properties :
-		As a convenience, this may be the field itself, all default options will then be applied.
+		As an alternative, this parameter can be an 'option' object (see next parameter) : in this case this is the only parameter allowed and all default values will then be applied.
+	@param {Object}		[options]
+		Optional properties.
+	@param {Ciform.Field}	[options.field]
+		Same as (replaces) <code>target</code><br />
+		If the target field has a CSS class of <code>sha1</code> or <code>ciform-sha1</code>, the {@link Ciform.Field#sha1} property will be forced to 1 or 2 respectively.
+	@param {boolean}		[options.commit=true]
+		If true, will write ciphertext into the output field.<br>
+		If false, will not touch the in and out field, but instead will return the {@link Ciform.Field}
+		with the following properties added :
 		<ul>
-		<li><code>&lt;{@link Ciform.Field}&gt; field</code> -
-			Same as (replaces) <code>target</code>.<br>
-		<li><code>&lt;{@link boolean}&gt; commit</code> -
-			If true, will write ciphertext into the output field.<br>
-			If false, will not touch the in and out field, but instead will return the {@link Ciform.Field}
-			with the following properties added :
-			<ul>
-				<li><code>&lt;{@link String}&gt; text</code> -
-					The value of the <em>input</em> field at the end of the operation.
-				<li><code>&lt;{@link String}&gt; ciphertext</code> -
-					The value of the <em>output</em> field at the end of the operation.
-			</ul>
-			Defaults to true.<br>
-			This parameter is usefull to handle transactional operations on several fields at once.
+			<li><code>&lt;{@link String}&gt; text</code> -
+				The value of the <em>input</em> field at the end of the operation.
+			<li><code>&lt;{@link String}&gt; ciphertext</code> -
+				The value of the <em>output</em> field at the end of the operation.
 		</ul>
-		As an alternative,<code>sha1</code> or <code>ciform-sha1</code> css classes can be set
-		in the <code>class</code> attribute of output fields, in order to set the {@link Ciform.Field#sha1} property to 1 or 2 respectively.
+		This parameter is usefull for instance to handle atomic operations on several fields at once.
 	@return false if there was an error, true or a {@link Ciform.Field} object if not
 	@type boolean|Ciform.Field
 */
@@ -766,7 +759,7 @@ Ciform.Cipher.prototype.encryptField = function( target, options )
 		options = target;
 	}
 
-	// NOTE : localOptions inherit both options specific to the field and those more generic ('commit')
+	// NOTE : localOptions inherits at the same time options specific to the field and those more generic ('commit')
 	var localOptions = merge( {'commit':true}, new Ciform.Field(target), options );
 	var text = localOptions['input'].value;
 	var nodOut = localOptions['output'];
@@ -885,13 +878,13 @@ Ciform.Cipher.prototype.encryptFields = function( fields, options )
 /**
 	Encrypts fields of a form.<br>
 
-	<p>For instance, the following encrypts input fields of type <em>password</em> in a form :
-	<pre>encryptForm(myForm,{'allowTypes':["password"]})</pre></p>
+	<p>For instance, the following encrypts input fields of type <em>password</em> in a form :</p>
+	<pre>encryptForm(myForm,{'allowTypes':["password"]})</pre>
 
 	@param {HTMLFormElement} target
 		The form to encrypt.<br>
 		As an alternative, this parameter can be ignored if the target is given in the options.
-	@param {Object} options (optional)
+	@param {Object} [options]
 		An object with the following properties :
 		<ul>
 		<li><code>&lt;{@link HTMLFormElement}&gt; form</code> -
@@ -982,7 +975,7 @@ Ciform.Cipher.prototype.encryptForm = function( target, options )
 	Encrypts the parameters in an URL.<br>
 
 	@param {String} url The full URL to encrypt (e.g. <code>"http://plugnauth.sf.net/ciform/demo.php?password=mysecret"</code>)
-	@param {Object} options (optional)
+	@param {Object} [options]
 		An object with the following properties :
 		<ul>
 		<li><code>&lt;{@link Array}&lt;{@link String}&gt;&gt; fields</code> -
@@ -1059,7 +1052,7 @@ Ciform.Cipher.prototype.encryptURL = function( url, options )
 // 
 // 	@param target
 // 		Either a text, a form, a form field or an array of fields to encrypt
-// 	@param options	(optional)
+// 	@param [options]
 // 		Options to pass to the encoding method
 // 	@see Ciform.Cipher#encryptForm
 // 	@see Ciform.Cipher#encryptField

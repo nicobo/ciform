@@ -1,5 +1,6 @@
 /*!
     Copyright 2004 by Herbert Hanewinkel, www.haneWIN.de
+    Original code : http://www.hanewin.net/encrypt/rsa/rsa.js
     About this package : http://ciform.google.com
 */
 //

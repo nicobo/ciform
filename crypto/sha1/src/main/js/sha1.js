@@ -1,5 +1,6 @@
 /*!
     Version 2.2 Copyright Paul Johnston 2000 - 2009.
+    Original code : http://pajhome.org.uk/crypt/md5/sha1.js
     About this package : http://ciform.google.com
 */
 //
