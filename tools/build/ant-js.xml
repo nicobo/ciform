@@ -41,34 +41,39 @@
 
     <extension-point name="test" depends="compile" description="Tests the compiled source code using a suitable unit testing framework. These tests should not require the code be packaged or deployed." />
 
-    <extension-point name="package" depends="test" description="Takes the compiled code and package it in its distributable format, such as a JAR." />
+    <extension-point name="package" depends="-check-package, test" unless="package.exists" description="Takes the compiled code and package it in its distributable format, such as a JAR." />
 
     <extension-point name="integration-test" depends="package" description="Processes and deploys the package if necessary into an environment where integration tests can be run." />
 
     <extension-point name="verify" depends="integration-test" description="Runs any checks to verify the package is valid and meets quality criteria." />
 
-    <extension-point name="install" description="Installs the package into the local repository, for use as a dependency in other projects locally." />
+    <extension-point name="install" depends="verify" description="Installs the package into the local repository, for use as a dependency in other projects locally." />
 
     <extension-point name="deploy" depends="verify" description="Done in an integration or release environment, copies the final package to the remote repository for sharing with other developers and projects." />
 
-    <extension-point name="clean" description="Restores the initial state of the project, deleting any generated file." />
+    <extension-point name="site" depends="verify" description="Generates site documentation for this project. This also includes snapshot releases in Ivy repository style." />
 
-    <extension-point name="site" depends="package" description="Generates site documentation for this project. This also includes snapshot releases in Ivy repository style." />
+    <extension-point name="clean" description="Restores the initial state of the project, deleting any generated file." />
 
 
     <!--
         Targets that implement "phases" (extension points)
     -->
 
-    <target name="make-validate" extensionOf="validate" description="Validates the project is correct and all necessary information is available.">
+    <target name="init-build" extensionOf="validate" description="Builds initial directories and makes sure all dependencies are there.">
         <!-- Retrieves dependencies with ivy : required to initialize the cache and to get informations about the module being built -->
         <!-- We use the default pattern, but put the resolved artifacts in a directory of ours so we can delete it afterwards -->
     	<ivy:retrieve pattern="${build.dir}/ivy/[conf]/[artifact].[ext]" sync="true" />
         <!-- Creates required directories -->
         <mkdir dir="${target.dir}" />
+        <!-- TODO check tools dependencies -->
     </target>
 
-    <target name="ivy-install" extensionOf="install" depends="validate" description="Builds and installs the artifacts into the local Ivy repository.">
+    <target name="-check-package" description="Checks that artifacts have been generated ; if not triggers the target 'integration-test'." >
+        <available property="package.exists" file="${target.lib.dir}/${ivy.module}.js" />
+    </target>
+
+    <target name="ivy-install" extensionOf="install" depends="verify" description="Builds and installs the artifacts into the local Ivy repository.">
         <!-- 'local' resolver is a default one bundled with Ivy ; it resides in the user's home directory -->
         <!-- 'artifactspattern' must match the name of the files this script builds -->
         <!-- Note : We use all options to force overwriting of existing (and possibly deprecated, during development) files -->
@@ -81,7 +86,7 @@
         <delete dir="${target.dir}" deleteonexit="true" failonerror="false" />
     </target>
 
-    <target name="doc" depends="validate" extensionOf="site" description="Generates API documentation for this project.">
+    <target name="doc" extensionOf="package" depends="validate" description="Generates API documentation for this project and other technical reports.">
 
         <!-- Generates a report of dependencies -->
         <ivy:report todir="${target.dir}/doc/ivy"/>
@@ -92,13 +97,14 @@
             <arg file="${src.dir}"/>
             <arg prefix="--template=" file="${jsdoc.template.dir}" />
             <arg prefix="--define=" value="projectName:${ant.project.name}" />
-            <arg prefix="--define=" value="license:${project.license}" />
+            <arg prefix="--define=" value="projectLicense:${project.license}" />
             <arg value="--allfunctions" />
             <arg value="--private" />
             <arg prefix="--directory=" file="${target.dir}/doc/api/js"/>
             <arg value="--recurse"/>
             <arg value="--verbose" />
         </java>
+        <!-- TODO check return code (it may fail) -->
 
         <echo message="Done generating site." />
 
@@ -169,7 +175,7 @@
         </ivy:makepom>
     </target>
 
-    <target name="hg-site" extensionOf="deploy" depends="site" description="Builds a local directory that will reflect the structure of the final site with Ivy and Maven repositories as well as online API docs" >
+    <target name="hg-site" extensionOf="site" depends="verify" description="Builds a local directory that will reflect the structure of the final site with Ivy and Maven repositories as well as online API docs" >
         <!-- First, creates an Ivy repo -->
         <ivy:settings id="ivy.repo.site" file="${ivy.settings.path}" />
         <!-- Note : transitive=false so we need to 'deploy' each project -->
@@ -237,7 +243,7 @@
         TODO fix and integrate the following targets
     -->
 
-    <target name="googlecode-upload" extensionOf="deploy" description="Uploads versionned artifacts to googlecode" >
+    <target name="googlecode-upload" extensionOf="deploy" depends="verify" description="Uploads versionned artifacts to googlecode" >
         <!-- TODO -->
     </target>
 

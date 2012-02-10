@@ -1,3 +1,7 @@
+/*!
+    Version 2.2 Copyright Paul Johnston 2000 - 2009.
+    About this package : http://ciform.google.com
+*/
 //
 // NOTE : The original code is wrapped so that the defined functions don't collide with existing ones.
 // See http://michaux.ca/articles/javascript-namespacing.

@@ -160,3 +160,17 @@ ul.inheritsList
 	text-align: right;
 	font-size: 10px;
 }
+
+
+
+#header {
+	background-image: url('fnd_header.png');
+	background-repeat: repeat-x;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+#header img {
+	text-align: center;
+}

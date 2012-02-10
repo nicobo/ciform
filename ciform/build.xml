@@ -16,7 +16,7 @@
 
     <property name="src.php.dir" value="${src.dir}/php" />
 
-    <target name="phpdoc" description="Generates PHP API docs">
+    <target name="phpdoc" extensionOf="package" depends="validate" description="Generates PHP API docs">
         <mkdir dir="${target.dir}/doc/api/php" />
         <exec command="${phpdoc.exe}" failonerror="true">
             <arg value="--directory" />
@@ -72,15 +72,14 @@
     <target name="install-all" depends="resolve-dependencies" description="Builds all dependent projects and installs their artifacts into the local Ivy repo.">
         <!-- executes the build script on each dependent module -->
         <subant buildpathref="build.lib.ants">
-            <target name="package" />
             <target name="install" />
         </subant>
     </target>
 
-    <target name="deploy-all" depends="resolve-dependencies, clean-site, install-all" description="Deploys all dependent projects.">
+    <target name="site-all" depends="resolve-dependencies" description="Builds all sites.">
         <!-- executes the build script on each dependent module -->
         <subant buildpathref="build.lib.ants">
-            <target name="deploy" />
+            <target name="site" />
         </subant>
     </target>
 

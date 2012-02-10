@@ -8,8 +8,8 @@
         </filesystem>
         <!-- Used to publish artifacts to a local repository exportable to the web -->
         <filesystem name="site">
-            <ivy pattern="${pub.dir}/[organisation]/[module]/[revision]/ivy.xml"/>
-            <artifact pattern="${pub.dir}/[organisation]/[module]/[revision]/[artifact].[ext]"/>
+            <ivy pattern="${pub.dir}/[organisation]/[module]/ivy.xml"/>
+            <artifact pattern="${pub.dir}/[organisation]/[module]/[artifact].[ext]"/>
         </filesystem>
     </resolvers>
 </ivysettings>

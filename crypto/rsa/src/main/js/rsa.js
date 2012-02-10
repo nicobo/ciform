@@ -1,3 +1,7 @@
+/*!
+    Copyright 2004 by Herbert Hanewinkel, www.haneWIN.de
+    About this package : http://ciform.google.com
+*/
 //
 // NOTE : The original code is wrapped so that the defined functions don't collide with existing ones.
 // See http://michaux.ca/articles/javascript-namespacing.
