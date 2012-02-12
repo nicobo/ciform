@@ -6,10 +6,10 @@
 		exit;
 	}
 
-	set_include_path("/opt/PEAR/".PATH_SEPARATOR.get_include_path());
-	set_include_path(get_include_path().PATH_SEPARATOR."../src/");
+	set_include_path( "/opt/PEAR/" . PATH_SEPARATOR . get_include_path() );
+	set_include_path( get_include_path() . PATH_SEPARATOR . "../src/" );
 	define("CIFORM_AUTODECRYPT",FALSE); // for demo purpose only
-	require_once("ciform.php");
+	require_once("ciform/ciform.php");
 ?><html>
 	<head>
 		<link rel="stylesheet" href="ciform.css" media="screen">

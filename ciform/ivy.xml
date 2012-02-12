@@ -1,9 +1,9 @@
 <ivy-module version="2.0">
     <info organisation="plugnauth" module="ciform" revision="1.0-SNAPSHOT" status="integration">
-        <license name="LGPL" url="http://plugnauth.sf.net/ciform/license"/>
+        <license name="LGPL" url="http://www.gnu.org/licenses/lgpl.html"/>
         <ivyauthor name="Nicolas BONARDELLE" url="http://nicobo.net/contact?subject=ciform+ivy"/>
-        <description homepage="http://plugnauth.sourceforge.net/ciform">
-            Ciform encrypts web forms before they are submitted, so data is not sent in clear text over the Internet.
+        <description homepage="http://ciform.googlecode.com">
+            Ciform encrypts HTML forms before they are submitted, so data is not sent in clear text over the Internet.
         </description>
     </info>
     <configurations>

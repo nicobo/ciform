@@ -2,7 +2,7 @@
 //
 // Ciform
 //
-// Copyright © 2008 Nicolas BONARDELLE <http://nicobo.net/contact>
+// Copyright (c) 2008 Nicolas BONARDELLE <http://nicobo.net/contact>
 //
 
 /**
@@ -16,7 +16,7 @@
  *
  * @package	ciform
  * @subpackage	ciphers
- * @link	http://plugnauth.sourceforge.net/ciform
+ * @link	http://ciform.googlecode.com
  * @author Nicolas BONARDELLE <http://nicobo.net/contact>
  */
 

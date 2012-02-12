@@ -52,7 +52,7 @@ define("CIFORM_SCHEMES_DEFAULT",array(
 		new Ciform_schemes_Base16(),
 		new Ciform_schemes_Base64(),
 		new Ciform_schemes_RSA()
-	);
+	));
 
 
 

@@ -4,7 +4,7 @@
    To use it, projects must import this file into their own build.xml and define all variables.
 -->
 <!-- TODO define all base targets as extension-point and make javascript.* targets -->
-<project name="javascript" default="package" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="javascript" default="package" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
     <!--
         Loads default properties : simple convenience (not specific to Javascript)
@@ -169,7 +169,7 @@
 
     <!-- TODO Works but misses minified artifact amongst other things ; see http://ant.1045680.n5.nabble.com/Review-Needed-for-quot-Publishing-Maven-Artifacts-with-Ivy-quot-Doc-td3204659.html -->
     <target name="build-pom" extensionOf="package" depends="validate" description="Builds a Maven POM.">
-        <ivy:makepom ivyfile="${basedir}/ivy.xml" pomfile="${target.dir}/${ivy.module}.pom">
+        <ivy:makepom ivyfile="${basedir}/ivy.xml" pomfile="${target.dir}/${ivy.module}.pom" templatefile="pom.xml">
             <mapping conf="default" scope="test"/>
             <mapping conf="minified" scope="compile"/>
         </ivy:makepom>
@@ -201,6 +201,59 @@
     <target name="clean-site" description="Deletes the local site built with 'buils-site'">
         <delete dir="${pub.dir}" includeemptydirs="true" deleteonexit="true" failonerror="false" />
     </target>
+
+
+    <!--
+        MAVEN
+    -->
+
+    <!-- TODO Use the latest artifact:deploy plugin -->
+    <macrodef name="maven-deploy" description="Deploy artifact to Maven repository">
+        <attribute name="repositoryurl" />
+        <attribute name="repositoryid" />
+        <attribute name="pom" default="pom.xml" />
+        <attribute name="artifact" />
+        <attribute name="classifier" default="" />
+        <sequential>
+            <artifact:mvn if="@{classifier}">
+                <arg value="org.apache.maven.plugins:maven-deploy-plugin:2.6:deploy-file" />
+                <arg value="-Durl=@{repositoryurl}" />
+                <arg value="-DrepositoryId=@{repositoryid}" />
+                <arg value="-DpomFile=@{pom}" />
+                <arg value="-Dfile=@{artifact}" />
+                <arg value="-Dclassifier=@{classifier}" />
+                <arg value="-Pgpg" />
+            </artifact:mvn>
+            <artifact:mvn unless="@{classifier}">
+                <arg value="org.apache.maven.plugins:maven-deploy-plugin:2.6:deploy-file" />
+                <arg value="-Durl=@{repositoryurl}" />
+                <arg value="-DrepositoryId=@{repositoryid}" />
+                <arg value="-DpomFile=@{pom}" />
+                <arg value="-Dfile=@{artifact}" />
+                <arg value="-Pgpg" />
+            </artifact:mvn>
+        </sequential>
+    </macrodef>
+
+    <target name="sonatype-deploy-snapshot" description="Deploys a snapshot to Sonatype's Maven repository" >
+        <!-- TODO Use Ivy to retrieve artifacts list -->
+        <!-- The user must have the repository defined with this id in its settings -->
+        <local name="artifact" />
+        <local name="file.exists" />
+
+        <!-- main artifact -->
+        <property name="file" value="${target.lib.dir}/${ivy.module}.js" />
+        <available property="file.exists" file="${artifact}" />
+        <echo unless="file.exists" message="${artifact} does not exist : skipping publication." />
+        <mavendeploy if="file.exists" repositoryurl="https://oss.sonatype.org/content/repositories/snapshots/" repositoryid="sonatype-nexus-snapshots" pom="${target.dir}/${ivy.module}.pom" artifact="${artifact}" />
+
+        <!-- 'standalone' artifact -->
+        <property name="file" value="${target.lib.dir}/lib${ivy.module}.js" />
+        <available property="file.exists" file="${artifact}" />
+        <echo unless="file.exists" message="${artifact} does not exist : skipping publication." />
+        <mavendeploy if="file.exists" repositoryurl="https://oss.sonatype.org/content/repositories/snapshots/" repositoryid="sonatype-nexus-snapshots" pom="${target.dir}/${ivy.module}.pom" artifact="${artifact}" />
+    </target>
+
 
     <!-- TEST ; not quite useful -->
     <target name="ant2dot" description="(internal)" >

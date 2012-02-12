@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>plugnauth.ciform</groupId>
+  <artifactId>ciform</artifactId>
+  <packaging>js</packaging>
+  <name>${ivy.pom.name}</name>
+  <version>${ivy.pom.version}</version>
+  <description>${ivy.pom.description}</description>
+  <url>${ivy.pom.url}</url>
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License, Version 3, 29 June 2007</name>
+      <url>http://www.gnu.org/licenses/lgpl.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>http://ciform.googlecode.com/hg</url>
+    <connection>scm:hg:http://ciform.googlecode.com/hg</connection>
+  </scm>
+  <developers>
+    <developer>
+      <id>cbonar</id>
+      <name>Nicolas BONARDELLE</name>
+      <email>http://nicobo.net/contact</email>
+    </developer>
+  </developers>
+</project>
